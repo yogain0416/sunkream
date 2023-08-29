@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userSytle.mybatis.userStyleMapper">
+	<select id="stylePopular" resultType="styleBoardAllDTO">
+		select
+		a.style_num,a.user_num,a.style_contents,a.style_like,a.reg_date,c.profile_img,c.profile_name,b.style_img1,b.style_img2,b.style_img3,b.style_img4,b.style_img5
+		from(style_Board a inner join style_img b on a.style_num=b.style_num)
+		inner join member c on a.user_num=c.user_num where c.del = 'N'
+		order by
+		a.style_like desc
+	</select>
+	<select id="styleNew" resultType="styleBoardAllDTO">
+		select
+		a.style_num,a.user_num,a.style_contents,a.style_like,a.reg_date,c.profile_img,c.profile_name,b.style_img1,b.style_img2,b.style_img3,b.style_img4,b.style_img5
+		from(style_Board a inner join style_img b on a.style_num=b.style_num)
+		inner join member c on a.user_num=c.user_num where c.del = 'N'
+		order
+		by
+		a.reg_date desc
+	</select>
+	<select id="getContents" resultType="styleBoardAllDTO"
+		parameterType="int">
+		select
+		a.style_num,a.user_num,a.style_contents,a.reg_date,b.profile_img,b.profile_name
+		from style_Board a
+		inner join member b on a.user_num=b.user_num
+		where
+		a.style_num=#{styleNum}
+	</select>
+	<update id="updateBoardOk" parameterType="styleBoardDTO">
+		update style_board set
+		style_contents=#{style_contents} where
+		style_num=#{style_num}
+	</update>
+	<select id="updateBoard" resultType="styleBoardAllDTO"
+		parameterType="int">
+		select
+		a.style_num,a.user_num,a.style_contents,a.reg_date,b.style_img1,b.style_img2,b.style_img3,b.style_img4,b.style_img5
+		from style_Board a
+		inner join style_img b on a.style_num=b.style_num
+		where
+		a.style_num=#{style_num}
+	</select>
+	<select id="getProdTagDTO" resultType="prodSearchDTO"
+		parameterType="int">
+		select a.prod_num,a.prod_subject as
+		subject,a.prod_price,a.del,b.prod_img1 from admin_prod a inner join
+		prod_img
+		b on a.prod_num=b.prod_num where a.prod_num=#{prod_num}
+	</select>
+	<select id="getProdTag" parameterType="int" resultType="int">
+		select
+		prod_num from prodTag where style_num=#{styleNum}
+	</select>
+	<insert id="insertProd_tags" parameterType="java.util.Map">
+		insert into prodTag
+		values(#{style_num},#{prod_num})
+	</insert>
+	<insert id="styleReplyOk" parameterType="styleReplyDTO">
+		insert into style_reply
+		values(style_reply_seq.nextval,#{style_num},#{user_num},#{reply_group},#{reply_step},#{reply_contents},#{reg_date})
+	</insert>
+	<select id="maxRegroup" parameterType="int" resultType="int">
+		select
+		Max(reply_group) from style_reply
+	</select>
+
+	<select id="getPickHashTag" resultType="String">
+		select pick_name from
+		pick_hashTag
+	</select>
+	<select id="checkPickList" resultType="int" parameterType="int">
+		select count(*) from pick_hashTag where pick_name=
+		(select hashTag_name
+		from hashTagBase where hashTag_num=#{hashTag_num})
+	</select>
+	<insert id="ban" parameterType="java.util.Map">
+		insert into ban
+		values(#{my_num},#{user_num})
+	</insert>
+
+	<delete id="removeBan" parameterType="java.util.Map">
+		delete from ban where
+		user_num=#{my_num} and ban_num=#{user_num}
+	</delete>
+	<select id="checkBan" parameterType="java.util.Map"
+		resultType="int">
+		select count(*) from ban where user_num=#{my_num} and
+		ban_num=#{user_num}
+	</select>
+	<select id="maxRestep" parameterType="java.util.Map"
+		resultType="int">
+		select Max(reply_step) from style_reply where
+		style_num=#{style_num} and
+		reply_group=#{reply_group}
+	</select>
+	<update id="likeStyle" parameterType="int">
+		update style_Board set
+		style_like= style_like+1 where style_num=#{styleNum}
+	</update>
+	<update id="removeLikeStyle" parameterType="int">
+		update style_Board
+		set style_like= style_like-1 where style_num=#{styleNum}
+	</update>
+	<select id="getContent" resultType="String" parameterType="int">
+		select style_contents from style_Board where style_num=#{styleNum}
+	</select>
+	<select id="getHashTag" resultType="hashTagBaseDTO"
+		parameterType="String">
+		select * from hashTagBase where hashTag_name=#{hashTag}
+	</select>
+	<select id="getFollower" parameterType="int" resultType="int">
+		select
+		follower_num from follower where user_num=#{user_num}
+	</select>
+	<select id="getFollowing" parameterType="int" resultType="int">
+		select
+		following_num from following where user_num=#{user_num}
+	</select>
+
+	<select id="likeList" parameterType="int" resultType="int">
+		select
+		distinct user_num from style_like where style_num=#{style_num}
+	</select>
+
+	<select id="countFollower" parameterType="int" resultType="int">
+		select count(*) from follower where user_num=#{user_num}
+	</select>
+	<select id="countFollowing" parameterType="int" resultType="int">
+		select count(*) from following where user_num=#{user_num}
+	</select>
+
+	<select id="followCheckDTO" resultType="followCheckDTO"
+		parameterType="int">
+		select user_num,profile_name,profile_img,name from
+		member where
+		user_num=#{num}
+	</select>
+	<select id="getStyleBoardAll" resultType="styleBoardAllDTO"
+		parameterType="styleBoardDTO">
+		select
+		a.style_num,a.user_num,a.style_contents,a.style_like,a.reg_date,c.profile_img,c.profile_name,b.style_img1,b.style_img2,b.style_img3,b.style_img4,b.style_img5
+		from(style_Board a inner join style_img b on a.style_num=b.style_num)
+		inner join member c on a.user_num=c.user_num where
+		a.style_num=#{style_num} and c.del = 'N'
+	</select>
+	<select id="myProfileStyleAll" resultType="styleBoardAllDTO"
+		parameterType="int">
+		select
+		a.style_num,a.user_num,a.style_contents,a.style_like,a.reg_date,b.style_img1,b.style_img2,b.style_img3,b.style_img4,b.style_img5
+		from style_Board a inner join style_img b on a.style_num=b.style_num
+		where a.user_num= #{user_num} order by a.reg_date desc
+	</select>
+	<select id="getAllReply" resultType="replyAllDTO"
+		parameterType="int">
+		select
+		a.reply_num,a.style_num,a.user_num,a.reply_group,a.reply_step,a.reply_contents,a.reg_date,b.profile_name,b.profile_img
+		from style_reply a inner join member b
+		on a.user_num=b.user_num where
+		a.style_num=#{styleNum}
+		order by a.reply_group desc, a.reply_step asc
+	</select>
+	<select id="getBanList" resultType="int" parameterType="int">
+		select
+		ban_num from ban where user_num=#{user_num}
+	</select>
+	<select id="test" resultType="String" parameterType="int">
+		select
+		reg_date from style_Board where style_num=#{style_num}
+	</select>
+
+	<select id="checkRegroupCount" resultType="int">
+		select count(*) from
+		style_reply where style_num= #{style_num}
+	</select>
+	<select id="checkRestepCount" parameterType="java.util.Map"
+		resultType="int">
+		select count(*) from style_reply where style_num=
+		#{style_num} and
+		reply_group=#{reply_group}
+	</select>
+	<insert id="following" parameterType="java.util.Map">
+		insert into following
+		values(#{my_num},#{user_num})
+	</insert>
+	<insert id="follower" parameterType="java.util.Map">
+		insert into follower
+		values(#{user_num},#{my_num})
+	</insert>
+	<delete id="removefollowing" parameterType="java.util.Map">
+		delete from following
+		where user_num=#{my_num} and following_num=#{user_num}
+	</delete>
+	<delete id="removefollower" parameterType="java.util.Map">
+		delete from follower
+		where user_num=#{user_num} and follower_num=#{my_num}
+	</delete>
+	<select id="isFollowing" resultType="int"
+		parameterType="java.util.Map">
+		select count(*) from following where
+		user_num=#{user_num} and
+		following_num=#{my_num}
+	</select>
+	<select id="isFollower" resultType="int"
+		parameterType="java.util.Map">
+		select count(*) from follower where user_num=#{user_num}
+		and
+		follower_num=#{my_num}
+	</select>
+
+	<select id="searchWriter" parameterType="String"
+		resultType="int">
+		select count(*) from member where
+		profile_name=#{profile_name} and del='N'
+	</select>
+	<insert id="addLike" parameterType="java.util.Map">
+		insert into style_like
+		values(#{styleNum},#{user_num},to_char(sysdate,'YY/MM/DD HH24:MI:SS'))
+	</insert>
+	<select id="checkSearchHashTag" parameterType="String"
+		resultType="hashTagBaseDTO">
+		select * from hashTagBase where hashTag_name like #{search}
+		order by hashTag_name asc
+	</select>
+	<select id="checkLike" parameterType="java.util.Map"
+		resultType="int">
+		select count(*) from style_like where
+		style_num=#{style_num} and user_num=#{user_num}
+	</select>
+	<delete id="deleteReply" parameterType="int">
+		delete from style_reply
+		where reply_group = (select reply_group from
+		style_reply where
+		reply_num=#{reply_num})
+	</delete>
+	<select id="getReply" resultType="StyleReplyDTO"
+		parameterType="int">
+		select * from style_reply
+		where reply_group = (select
+		reply_group from
+		style_reply where
+		reply_num=#{reply_num})
+	</select>
+	<select id="getReplyStyleBoard" resultType="styleReplyDTO"
+		parameterType="int">
+		select * from style_reply where style_num=#{styleNum}
+	</select>
+	<delete id="deleteReReply" parameterType="int">
+		delete from style_reply
+		where reply_num=#{reply_num}
+	</delete>
+	<select id="getReReply" resultType="styleReplyDTO"
+		parameterType="int">
+		select * from style_reply where reply_num=#{reply_num}
+	</select>
+	<delete id="removeLike" parameterType="java.util.Map">
+		delete from style_like
+		where style_num=#{styleNum} and user_num=#{user_num}
+	</delete>
+
+	<select id="getStyleUserNum" parameterType="String"
+		resultType="int">
+		select user_num from member where
+		profile_name=#{profile_name} and del='N'
+	</select>
+
+	<select id="getProfileName" parameterType="int"
+		resultType="String">
+		select profile_name from member where user_num= #{num} and
+		del='N'
+	</select>
+
+	<select id="checkSearchNick" parameterType="String"
+		resultType="memberDTO">
+		select * from member where profile_name like #{search} and
+		del='N' and
+		profile_name !='admin'
+		order by profile_name asc
+	</select>
+
+	<insert id="styleWrite" parameterType="java.util.Map">
+		insert into style_Board
+		values(style_board_seq.nextval,#{user_num},#{style_contents},0,#{reg_date})
+	</insert>
+
+	<insert id="styleImgWrite" parameterType="styleImgDTO">
+		insert into style_img
+		values(#{style_num},#{user_num},#{style_img1},#{style_img2},#{style_img3},#{style_img4},#{style_img5})
+	</insert>
+
+	<select id="getHasgTagDTO" resultType="hashTagBaseDTO"
+		parameterType="String">
+		select * from hashTagBase where hashTag_name= #{name}
+	</select>
+
+	<select id="getMemberDTO" parameterType="int"
+		resultType="memberDTO">
+		select * from member where user_num =#{user_num}
+	</select>
+
+	<select id="getStyle_num" resultType="int" parameterType="int">
+		select
+		distinct style_num from hashTag where hashTag_num= #{hashTag_num}
+	</select>
+
+	<select id="getStyleBoardDTO" resultType="styleBoardDTO"
+		parameterType="int">
+		select * from style_Board where style_num=#{style_num}
+	</select>
+
+	<!-- <select id="sysdate" resultType="String"> select to_char(sysdate,'YY/MM/DD 
+		HH24:MI:SS') from DUAL </select> -->
+	<select id="getStyleBoardNum" parameterType="styleBoardDTO"
+		resultType="int">
+		select style_num from style_Board where
+		reg_date=#{reg_date}
+		and
+		user_num=#{user_num}
+	</select>
+
+	<insert id="addHashTagBase" parameterType="String">
+		insert into
+		hashTagBase values(hashTag_seq.nextval,#{hashTag},1)
+
+	</insert>
+	<insert id="addHashTag" parameterType="java.util.Map">
+		insert into hashTag
+		values(#{hashTag_num},#{style_num},#{reg_date})
+	</insert>
+
+	<delete id="deleteFollower" parameterType="int">
+		delete from follower
+		where user_num=#{user_num} or follower_num=#{user_num}
+	</delete>
+	<delete id="deleteFollowing" parameterType="int">
+		delete from following
+		where user_num=#{user_num} or
+		following_num=#{user_num}
+	</delete>
+	<delete id="deleteBanList" parameterType="int">
+		delete from ban where
+		user_num=#{user_num} or ban_num=#{user_num}
+	</delete>
+	<delete id="deleteMemberReply" parameterType="int">
+		delete from
+		style_reply where user_num=#{user_num}
+	</delete>
+	<delete id="deleteMemberLike" parameterType="int">
+		delete from
+		style_like where user_num=#{user_num}
+	</delete>
+	<select id="myLikeAll" parameterType="int" resultType="int">
+		select style_num from style_like where user_num=#{user_num}
+	</select>
+
+	<delete id="deleteBoardReply" parameterType="int">
+		delete from
+		style_reply where style_num=#{styleNum}
+	</delete>
+	<delete id="deleteBoardProdTag" parameterType="int">
+		delete from
+		prodTag where style_num=#{styleNum}
+	</delete>
+	<delete id="deleteBoardLike" parameterType="int">
+		delete from
+		style_like where style_num=#{styleNum}
+	</delete>
+
+	<delete id="deleteBoard" parameterType="int">
+		delete from style_Board
+		where style_num=#{styleNum}
+	</delete>
+	<delete id="deleteBoardImg" parameterType="int">
+		delete from style_img
+		where style_num=#{styleNum}
+	</delete>
+	<delete id="deleteHashTag" parameterType="java.util.Map">
+		delete from hashTag
+		where hashTag_num=#{hashTag_num} and reg_date=#{reg_date}
+	</delete>
+	<delete id="deleteAllHashTag" parameterType="int">
+		delete from hashTag
+		where style_num=#{styleNum}
+	</delete>
+	<delete id="deleteHashTagBase" parameterType="String">
+		delete from
+		hashTagBase where hashTag_name=#{hashTag}
+	</delete>
+	<delete id="deleteHashTagBaseNum" parameterType="int">
+		delete from
+		hashTagBase where hashTag_num=#{hashTag_num}
+	</delete>
+	<select id="getHashTagCount" parameterType="String"
+		resultType="int">
+		select count(*) from hashTag where hashTag_num= (select
+		hashTag_num from hashTagBase where hashTag_name= #{hashTag})
+	</select>
+	<select id="getHashTagBaseCount" parameterType="String"
+		resultType="int">
+		select count(*) from hashTagBase where
+		hashTag_name=#{hashTag}
+	</select>
+	<select id="getHashTagBaseCountNum" parameterType="String"
+		resultType="int">
+		select hashTag_count from hashTagBase where
+		hashTag_num=#{hashTag_num}
+	</select>
+	<select id="hashTagCount" parameterType="int" resultType="int">
+		select
+		count(*) from hashTagBase where hashTag_num= #{hashTag_num}
+	</select>
+	<select id="getHashTagNum" parameterType="String"
+		resultType="int">
+		select hashTag_num from hashTagBase where hashTag_name =
+		#{hashTag}
+	</select>
+	<select id="style_cate_subtype" parameterType="String"
+		resultType="prodCateDTO">
+		select distinct cate_subtype, cate_kr_subtype, cate_type
+		from prod_cate where
+		cate_type=#{cate}
+	</select>
+	<select id="checkHashTag" parameterType="String"
+		resultType="hashTagBaseDTO">
+		select * from
+		hashTagBase where hashTag_name = #{hashTag}
+	</select>
+	<update id="plusHashTagCount" parameterType="String">
+		update hashTagBase
+		set hashTag_count = hashTag_count +1 where hashTag_name =
+		#{hashTag}
+	</update>
+
+	<update id="minusHashTagCount" parameterType="String">
+		update hashTagBase
+		set hashTag_count = hashTag_count -1 where hashTag_name =
+		#{hashTag}
+	</update>
+	<update id="minusHashTagCountNum" parameterType="int">
+		update
+		hashTagBase
+		set hashTag_count = hashTag_count -1 where hashTag_num =
+		#{hashTag_num}
+	</update>
+	<select id="allHashTag" parameterType="int"
+		resultType="hashTagDTO">
+		select * from hashTag where style_num=#{style_num}
+	</select>
+
+	<select id="getLikeSu" parameterType="int" resultType="int">
+		select
+		style_like from style_Board where style_num=#{styleNum}
+	</select>
+
+	<select id="todayDateStart" resultType="String">
+		select
+		to_char(sysdate,'yy/mm/dd') from dual
+	</select>
+	<select id="todayDateEnd" resultType="String">
+		select
+		to_char(sysdate,'yy/mm/dd HH24:MI:SS') from dual
+	</select>
+	<select id="weekAgo" resultType="String">
+		select
+		to_char(sysdate-6,'yy/mm/dd') from dual
+	</select>
+	<select id="selectProdNum" resultType="int"
+		parameterType="String">
+		select distinct prod_group from
+		admin_prod where
+		cate_type=#{cate}
+	</select>
+
+	<select id="selectProdNum_subType" resultType="int"
+		parameterType="java.util.Map">
+		select distinct prod_group from
+		admin_prod where
+		cate_type=#{cate} and cate_subType=#{subType}
+	</select>
+	<select id="styleProdTag" resultType="int" parameterType="int">
+		select
+		distinct style_num from prodTag where prod_num=#{prod_num}
+	</select>
+	<select id="styleRanking" resultType="styleBoardAllDTO"
+		parameterType="int">
+		select
+		a.style_num,a.user_num,a.style_contents,a.style_like,a.reg_date,c.profile_img,c.profile_name,b.style_img1
+		from(style_Board a inner join style_img b on a.style_num=b.style_num)
+		inner join member c on a.user_num=c.user_num where
+		a.style_num=#{style_num} and c.del='N'
+	</select>
+
+	<select id="selectRanking" resultType="int"
+		parameterType="java.util.Map">
+		select
+		style_num
+		from
+		(select rownum rn,a.* from
+		(select
+		count(*) as co,style_num from style_like where reg_date between
+		#{startDate} and #{todayDate} group by style_num order by co desc)a)
+		where rn between 1 and 20
+	</select>
+
+	<select id="styleFollowing" resultType="styleBoardAllDTO"
+		parameterType="int">
+		select
+		a.style_num,a.user_num,a.style_contents,a.style_like,a.reg_date,c.profile_img,c.profile_name,b.style_img1
+		from(style_Board a inner join style_img b on a.style_num=b.style_num)
+		inner join member c on a.user_num=c.user_num where
+		a.user_num =
+		#{following_num} and c.del='N'
+	</select>
+
+	<select id="myStyleAllNum" parameterType="int" resultType="int">
+		select style_num from style_board where
+		user_num=#{user_num}
+	</select>
+	<select id="getAllHashTag" parameterType="int" resultType="int">
+		select hashTag_num from hashTag where style_num=#{styleNum}
+	</select>
+
+	<select id = "getStyleBoard_num" parameterType = "Map" resultType = "int">
+      select style_num from style_board where user_num = #{user_num} and reg_date = #{date}
+    </select>
+</mapper>

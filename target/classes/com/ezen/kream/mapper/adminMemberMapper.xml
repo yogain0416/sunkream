@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ezen.kream.mapper.adminMemberMapper">
+ 
+ 	<select id="memberList" parameterType="java.util.Map" resultType="memberDTO">
+ 		select * from (select rownum rn, A.* from 
+ 			(select * from member where del = #{del} order by user_num desc)A)
+			where rn between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="getCount" parameterType="String" resultType="int">
+ 		select count(*) from member where del = #{del}
+ 	</select>
+ 	
+ 	<select id="memberFind" parameterType="java.util.Map" resultType="memberDTO">
+ 		select * from (select rownum rn, A.* from 
+ 			(select * from member where ${search} like #{searchString} and del = #{del}
+ 			order by user_num desc)A) 
+ 			where rn between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="getFindCount" parameterType="java.util.Map" resultType="int">
+ 		select count(*) from member where ${search} like #{searchString} and del = #{del}
+ 	</select>
+ 	
+ 	<select id="memberDetail" parameterType="int" resultType="memberDTO">
+ 		select * from member where user_num = #{user_num}
+ 	</select>
+ 	
+ 	<update id="memberEdit" parameterType="java.util.Map">
+ 		update member set penalty=#{penalty}, admin_info=#{admin_info}
+ 			where user_num = #{user_num}
+ 	</update>
+ 	
+ 	<select id="memberReport" parameterType="String" resultType="QnABoardAllDTO">
+ 		select*from QnA_Board where qna_subCate ='신고' and qna_process = #{qna_process}
+ 	</select>
+ 	
+ 	<select id="agetQnABoard" parameterType="int" resultType="QnABoardDTO">
+ 		select * from QnA_Board where qna_num = #{qna_num}
+ 	</select>
+ 	
+ 	<select id="getWaitCount" resultType="int">
+ 		select count(*) from qna_board where qna_cate = '1:1문의' and qna_subCate = '신고'
+ 		and qna_process = '대기중'
+ 	</select>
+	
+	<select id="getOkCount" resultType="int">
+		select count(*) from qna_board where qna_cate = '1:1문의' and qna_subCate = '신고'
+ 		and qna_process = '처리완료'
+	</select>
+	
+	<select id="memberReportList" parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+		select * from (select rownum rn, A.* from 
+ 			(select * from qna_board 
+ 			where qna_cate = '1:1문의' and qna_subCate = '신고' and qna_process = #{process} 
+ 			order by qna_step asc)A) 
+ 			where rn between #{start} and #{end}
+	</select>
+		
+	<select id="getFindSubjectCount" parameterType="java.util.Map" resultType="int">
+		select 
+		count(*) 
+		from qna_board 
+		where qna_cate = '1:1문의' and qna_subCate = '신고' and qna_process = #{process}
+		and ${search} like #{searchString}
+	</select>
+	
+	<select id="getFindWriterCount" parameterType="java.util.Map" resultType="int">
+		select 
+		count(*) 
+		from 
+		qna_board a inner join (select user_num,profile_name from member)b
+		on a.${search} = b.user_num
+		where b.profile_name like #{searchString}
+		and a.qna_cate = '1:1문의' 
+		and a.qna_subCate = '신고' and a.qna_process = #{process}
+	</select>
+	
+	<select id="memberReportFindSubjectList" parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+		select * from (select rownum rn, a.* from
+		(select * from qna_board where qna_cate = '1:1문의' 
+		and qna_subCate = '신고' and qna_process = #{process}
+		and ${search} like #{searchString}
+		order by qna_step asc)a)
+		where rn between #{start} and #{end}
+	</select>
+	
+	<select id="memberReportFindWriterList" parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+		select 
+		c.* 
+		from 
+		(select rownum rn, a.* from
+		(select * from qna_board 
+		where qna_cate = '1:1문의' and qna_subCate = '신고' and qna_process = #{process}
+		order by qna_step asc)a 
+		inner join (select user_num,profile_name from member where profile_name like #{searchString})b
+		on a.${search} = b.user_num)c
+		where rn between #{start} and #{end}
+	</select>
+ </mapper>

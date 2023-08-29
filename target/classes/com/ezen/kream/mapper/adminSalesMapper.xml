@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.ezen.kream.mapper.adminSalesMapper">
+ 	
+ 	<select id="allSalesList" resultType="SalesAllDTO">
+ 		select * from sales
+ 	</select>
+ 	
+ 	<select id="salesList" parameterType="java.util.Map" resultType="SalesAllDTO">
+ 		select * from sales where reg_date between #{start} and #{end} order by reg_date desc
+ 	</select>
+ 	
+ 	<select id="income" parameterType="java.util.Map" resultType="int">
+ 		select
+ 		case when count(*) = 0 then 0 
+ 		when count(*) != 0 then sum(money) 
+ 		end
+ 		from sales 
+ 		where sales_type = 'in' 
+ 		and reg_date between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="outcome" parameterType="java.util.Map" resultType="int">
+ 		select 
+ 		case when count(*) = 0 then 0 
+ 		when count(*) != 0 then sum(money) 
+ 		end
+ 		from sales 
+ 		where sales_type = 'out' 
+ 		and reg_date between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="todayCount" parameterType="java.util.Map" resultType="int">
+ 		select count(*) from sales
+ 		where gender = #{gender}
+ 		and reg_date between #{start} and #{end}
+ 	</select>
+ 	
+ 	
+ 	
+ </mapper>

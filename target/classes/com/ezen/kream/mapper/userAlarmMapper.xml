@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.ezen.kream.mapper.userAlarmMapper">
+    <select id = "getStyleBoardUserNum" parameterType = "int" resultType= "int">
+       select user_num from style_board where style_num = #{style_num}
+    </select>
+    <insert id = "insertAlarm" parameterType = "Map">
+       insert into alarm values(alarm_seq.nextval,#{getUser_num},#{sendUser_num},#{alarm_kind},#{alarm_kind_num},to_char(sysdate,'yy/mm/dd HH24:MI:SS'),'N',#{followCheck},#{info})
+    </insert>
+    <update id = "setAnnounceAlarm" parameterType = "Map">
+       update alarm set isChecked = 'N',alarm_kind = #{alarm_kind} where alarm_kind_num = #{alarm_kind_num}
+    </update>
+    <update id = "setAsk" parameterType = "Map">
+       update alarm set isChecked = 'N', alarm_kind = #{alarm_kind} where alarm_kind_num = #{alarm_kind_num}
+    </update>
+    <insert id = "insertCartAlarm" parameterType = "Map">
+       insert into alarm values(alarm_seq.nextval,#{getUser_num},#{sendUser_num},#{alarm_kind},#{alarm_kind_num},to_char(sysdate,'yy/mm/dd HH24:MI:SS'),'Y',#{followCheck})
+    </insert>
+    <select id = "userAlarmCheck" parameterType = "int" resultType = "int">
+       select count(*) from alarm where getUser_num = #{user_num} and isChecked = 'N' 
+    </select>
+    <update id="setAlarmCheck" parameterType = "int">
+       update alarm set isChecked = 'Y' where getUser_num = #{user_num} 
+    </update>
+    <select id = "getStyleLikeAlarmList" parameterType = "int" resultType = "AlarmAllDTO">
+       select A.*,d.profile_name,d.profile_img,c.style_img1 from alarm a inner join style_board b on a.getUser_num = b.user_num inner join style_img c on b.style_num = c.style_num 
+       inner join member d on a.sendUser_num = d.user_num
+       where a.getUser_num = #{user_num} and a.alarm_kind = 'like' and a.alarm_kind_num = b.style_num
+    </select>
+    <select id = "getFollowAlarmList" parameterType = "int" resultType = "AlarmAllDTO">
+       select A.*,d.profile_name,d.profile_img from alarm a inner join member d on a.sendUser_num = d.user_num
+       where a.getUser_num = #{user_num} and a.alarm_kind = 'follow' and a.alarm_kind_num = #{user_num}
+     </select>
+     <select id = "getReplyList" parameterType = "int" resultType = "AlarmAllDTO">
+        select A.*,d.profile_img,d.profile_name,c.style_img1,e.profile_name as myProfile_name, b.style_num 
+         from alarm a inner join style_board b on b.style_num = a.alarm_kind_num inner join style_img c on b.style_num = c.style_num inner join member d on a.sendUser_num = d.user_num 
+         inner join member e on a.getUser_num = e.user_num 
+         where a.getUser_num = #{user_num} and a.alarm_kind = 'style_reply'
+     </select>
+     <select id = "getRereplyList" parameterType = "int" resultType = "AlarmAllDTO">
+        select A.*,d.profile_img,d.profile_name,c.style_img1,e.profile_name as myProfile_name, b.style_num 
+         from alarm a inner join style_board b on b.style_num = a.alarm_kind_num inner join style_img c on b.style_num = c.style_num inner join member d on a.sendUser_num = d.user_num 
+         inner join member e on a.getUser_num = e.user_num 
+         where a.getUser_num = #{user_num} and a.alarm_kind = 'style_reReply'
+     </select>
+     <select id = "getTag_ReplyList" parameterType = "int" resultType = "AlarmAllDTO">
+     select A.*,e.profile_name,e.profile_img,d.profile_name as myProfile_name,c.style_img1 from alarm a 
+     inner join style_board b on a.alarm_kind_num = style_num 
+     inner join style_img c on c.style_num = b.style_num 
+     inner join member d on d.user_num = a.getUser_num 
+     inner join member e on e.user_num = a.sendUser_num 
+     where a.getUser_num = #{user_num} and a.alarm_kind = 'tag_reply'
+     </select>
+     <select id = "getTag_reReplyList" parameterType = "int" resultType = "AlarmAllDTO">
+        select A.*,e.profile_name,e.profile_img,d.profile_name as myProfile_name,c.style_img1 from alarm a 
+     inner join style_board b on a.alarm_kind_num = style_num 
+     inner join style_img c on c.style_num = b.style_num 
+     inner join member d on d.user_num = a.getUser_num 
+     inner join member e on e.user_num = a.sendUser_num 
+     where a.getUser_num = #{user_num} and a.alarm_kind = 'tag_reReply'
+     </select>
+     <select id = "getAnnotationList" parameterType = "int" resultType = "AlarmAllDTO">
+        select A.*,b.profile_name,b.profile_img,c.profile_name as myProfile_name from 
+        alarm a inner join member b on a.sendUser_num = b.user_num 
+        inner join member c on a.getUser_num = c.user_num inner join style_board d on d.style_num = a.alarm_kind_num
+        where a.getUser_num = #{user_num} and a.alarm_kind = 'tag_id'
+     </select>
+    <select id = "getUser_num" parameterType = "String" resultType = "int">
+       select user_num from member where profile_name = #{writer} and del = 'N'
+    </select>
+    <select id = "getTagCount" parameterType ="Map" resultType = "int">
+       select count(*)   from alarm where alarm_kind_num = #{style_num} and sendUser_num = #{sendUser_num} and alarm_kind = #{alarm_kind} and getUser_num = #{getUser_num}
+    </select>
+    <select id = "followAlarmCount" parameterType= "Map" resultType = "int">
+       select count(*)    from alarm where alarm_kind = 'follow' and sendUser_num = #{sendUser_num} and getUser_num = #{getUser_num} and alarm_kind_num = #{alarm_kind_num}
+    </select>
+    <select id = "followerAlarmCount" parameterType = "Map" resultType = "int">
+       select count(*) from alarm where alarm_kind = 'follow' and sendUser_num = #{getUser_num} and getUser_num = #{sendUser_num}  and alarm_kind_num = #{sendUser_num}
+    </select>
+    <select id = "followAlarmCheck" parameterType = "Map" resultType = "int" >
+       select followCheck from alarm where alarm_kind = 'follow' and sendUser_num = #{sendUser_num} and getUser_num = #{getUser_num} and alarm_kind_num = #{alarm_kind_num}
+    </select>
+    <update id = "setFollowCheck" parameterType = "Map">
+       update alarm set followCheck = #{followCheck}, isChecked = 'N' where sendUser_num = #{sendUser_num} and getUser_num = #{getUser_num} and alarm_kind_num = #{alarm_kind_num}
+    </update>
+    <update id = "removeFollowCheck"  parameterType = "Map">
+       update alarm set followCheck = #{followCheck} where sendUser_num = #{sendUser_num} and getuser_num = #{getUser_num} and alarm_kind_num = #{alarm_kind_num}
+    </update>
+    <select id = "getRereplyUserNum" parameterType = "String" resultType = "int">
+       select user_num from member where profile_name = #{name}
+    </select>
+    <select id = "getAlarmNum" parameterType = "int" resultType = "int">
+       select alarm_num from alarm where alarm_kind_num = #{prod_num}
+    </select>
+    <delete id = "deleteAlarm" parameterType = "int">
+       delete from alarm where alarm_kind_num = #{getAlarm_num}
+    </delete>
+    <select id = "getCartCout" parameterType = "Map" resultType = "int">
+       select count(*)    from alarm where getUser_num = #{getUser_num} and alarm_kind_num = #{alarm_kind_num} and alarm_kind = #{alarm_kind}
+    </select>
+    <select id = "getAlarm_Num_UserList" parameterType = "Map" resultType = "int">
+       select getUser_num   from alarm where alarm_kind = #{alarm_kind}
+    </select>
+    <update id = "setCartAlarm" parameterType = "Map" >
+       update alarm set isChecked = 'N',followCheck = #{followCheck} , sendUser_num = #{sendUser_num} where alarm_kind_num = #{alarm_kind_num} and getUser_num = #{getUser_num} and alarm_kind = #{alarm_kind}
+    </update>
+    <select id = "getCartQtyList" parameterType = "int" resultType = "alarmAllDTO" >
+       select A.*,b.prod_kr_subject , c.prod_img1 as profile_img,b.prod_group as prod_price from alarm a inner join admin_prod b on a.alarm_kind_num = b.prod_num inner join prod_img c on b.prod_group = c.prod_num where a.getUser_num = #{user_num} and a.alarm_kind = 'cart_qty'
+    </select>
+    <select id = "getCartPriceList" parameterType = "int" resultType = "alarmAllDTO" >
+       select A.*,b.prod_kr_subject , c.prod_img1 as profile_img,b.prod_group as prod_price from alarm a inner join admin_prod b on a.alarm_kind_num = b.prod_num inner join prod_img c on b.prod_group = c.prod_num where a.getUser_num = #{user_num} and a.alarm_kind = 'cart_price'
+    </select>
+    <select id = "getCartNumList" parameterType = "int" resultType ="int">
+       select user_num from cartList where prod_num = #{prod_num}
+    </select>
+    <select id = "getSellUserNum" parameterType ="Map" resultType = "int">
+       select user_num from sell_prod where prod_group = #{prod_group} and prod_size = #{prod_size} and sell_num = #{sell_num}
+    </select>
+    <select id = "getBuy_AuctionList" parameterType = "int" resultType= "AlarmAllDTO">
+       select A.*,c.prod_kr_subject,d.prod_img1 as profile_img,e.profile_name,b.prod_price,b.buy_num,b.prod_size,b.auction,b.prod_num as sell_num 
+       from alarm a 
+       inner join buy_prod b on a.alarm_kind_num = b.buy_num 
+       inner join admin_prod c on b.prod_size = c.prod_size and b.prod_group = c.prod_group 
+       inner join prod_img d on c.prod_group= d.prod_num 
+       inner join member e on b.user_num = e.user_num where a.getUser_num = #{user_num} and a.alarm_kind = 'buy_auction' 
+    </select>
+    <select id = "getSellAuctionList" parameterType= "int" resultType ="AlarmAllDTO">
+       select A.*,c.prod_kr_subject,d.prod_img1 as profile_img,e.profile_name,b.prod_price,b.buy_num,b.prod_size,b.auction from alarm a inner join buy_prod b on a.alarm_kind_num = b.buy_num 
+       inner join admin_prod c on b.prod_size = c.prod_size and b.prod_group = c.prod_group
+       inner join prod_img d on c.prod_group = d.prod_num 
+       inner join member e on b.user_num = e.user_num where a.getUser_num = #{user_num} and a.alarm_kind = 'sell_auction'
+    </select>
+    <select id="getSellSuccessList" parameterType = "int" resultType = "AlarmAllDTO">
+       select A.*,c.prod_kr_subject,d.prod_img1 as profile_img,e.profile_name,b.prod_price,b.buy_num,b.prod_size,b.auction from alarm a inner join buy_prod b on a.alarm_kind_num = b.buy_num 
+       inner join admin_prod c on b.prod_size = c.prod_size and b.prod_group = c.prod_group
+       inner join prod_img d on c.prod_group = d.prod_num 
+       inner join member e on b.user_num = e.user_num where a.getUser_num = #{user_num} and a.alarm_kind = 'sell_success'
+    </select>
+    <select id = "getAnnounceList" resultType ="AlarmAllDTO" parameterType = "int">
+       select A.*,b.qna_subject as prod_kr_subject from alarm a inner join qna_board b on a.alarm_kind_num = b.qna_num where a.alarm_kind = 'announce' and a.getUser_num = #{user_num}
+    </select>
+    <select id = "getReportList" parameterType ="int" resultType = "AlarmAllDTO">
+       select A.*,c.penalty from alarm a inner join qna_board b on a.alarm_kind_num = b.qna_num inner join member c on a.getUser_num = c.user_num where a.getUser_num = #{user_num} and a.alarm_kind = 'report'
+    </select>
+    <select id = "getAskReplyList" parameterType = "int" resultType ="AlarmAllDTO">
+       select A.*,b.qna_subject as prod_kr_subject from alarm a inner join qna_board b on a.alarm_kind_num = b.qna_num where a.getUser_num = #{user_num} and a.alarm_kind = 'ask'
+    </select>
+    <select id = "getAskSetReplyList" parameterType = "int" resultType ="AlarmAllDTO">
+       select A.*,b.qna_subject as prod_kr_subject from alarm a inner join qna_board b on a.alarm_kind_num = b.qna_num where a.getUser_num = #{user_num} and a.alarm_kind = 'ask_set'
+    </select>
+    <select id = "getUserAllNumList" resultType = "int">
+       select distinct getUser_num   from alarm
+    </select>
+    <select id = "getWriter_Count" parameterType = "String" resultType = "int">
+       select count(*) from member where profile_name = #{writer}   and del = 'N'    
+    </select>
+       <select id = "getCancelBuyUser" parameterType = "int" resultType = "BuyProdDTO">
+       select * from buy_prod where auction = 'X' and prod_num = #{i}
+    </select>
+    <select id = "sellDead_List" resultType = "SellProdDTO">
+       select * from sell_prod where auction = 'W' 
+          and end_date between '23/01/01 00:00:00' and to_char(sysdate,'YY/MM/DD HH24:MI:SS')
+    </select>
+    <select id = "getBuyDeadList" parameterType = "int" resultType= "AlarmAllDTO">
+       select A.*,c.prod_kr_subject,d.prod_img1 as profile_img,b.prod_price,b.buy_num,b.prod_size,b.prod_num as sell_num 
+       from alarm a 
+       inner join buy_prod b on a.alarm_kind_num = b.buy_num 
+       inner join admin_prod c on b.prod_size = c.prod_size and b.prod_group = c.prod_group 
+       inner join prod_img d on c.prod_group= d.prod_num 
+       where a.getUser_num = #{user_num} and a.alarm_kind = 'buyDead' 
+    </select>
+    <select id = "getSellDeadList" parameterType= "int" resultType ="AlarmAllDTO">
+       select A.*,c.prod_kr_subject,d.prod_img1 as profile_img,b.prod_price,b.sell_num asbuy_num,b.prod_size from alarm a 
+       inner join sell_prod b on a.alarm_kind_num = b.sell_num 
+       inner join admin_prod c on b.prod_size = c.prod_size and b.prod_group = c.prod_group 
+       inner join prod_img d on c.prod_group = d.prod_num 
+       where a.getUser_num = #{user_num} and a.alarm_kind = 'sellDead' 
+    </select>
+ </mapper>

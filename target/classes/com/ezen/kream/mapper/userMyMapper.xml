@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.ezen.kream.mapper.userMyMapper">
+	<select id="getUserInfo" parameterType="int" resultType="memberDTO">
+		select * from member where user_num = #{user_num}
+	</select>
+	
+	<select id="getBuyList" parameterType="int" resultType="buyProdDTO">
+		select * from buy_prod where user_num = #{user_num} order by start_date desc
+	</select>
+	
+	<select id="getSellList" parameterType="int" resultType="sellProdDTO">
+		select * from sell_prod where user_num = #{user_num} order by start_date desc
+	</select>
+	
+	<select id="getCartList" parameterType="int" resultType="cartListDTO">
+		select * from cartList where user_num =#{user_num}	
+	</select>
+	
+	<select id="getDirectInfo" parameterType="cartListDTO" resultType="adminAllDTO">
+		select 
+		a.prod_num,a.user_num,b.prod_brand,b.prod_subject,b.prod_price,b.prod_size, c.prod_img1
+		from
+		cartList a inner join admin_prod b on a.prod_num = b.prod_num
+		inner join prod_img c on a.prod_num = c.prod_num
+		where a.prod_num = #{prod_num} and a.user_num = #{user_num} 
+	</select>
+	
+	<select id="getAuctionInfo" parameterType="cartListDTO" resultType="adminAllDTO">
+		select
+		a.prod_num,a.user_num,b.
+		from
+		cartList a inner join sell_prod b on a.prod_num = b.prod_num
+		inner join prod_img c on b.prod_group = c.prod_num
+		inner join admin_prod d on b.prod_group = d.prod_group
+		where a.prod_num = #{prod_num} and a.user_num = #{user_num} and d.prod_size = '0' 
+	</select>
+	
+	<select id="myProfileManageInfo" parameterType="int" resultType="memberDTO">
+		select * from member where user_num = #{user_num}
+	</select>
+	
+	<update id="editProfileImg" parameterType="java.util.Map">
+		update member set profile_img = #{profile_img} where user_num = #{user_num}
+	</update>
+	
+	<update id="editProfileName" parameterType="java.util.Map">
+		update member set profile_name = #{profile_name} where user_num = #{user_num}
+	</update>
+	
+	<update id="editName" parameterType="java.util.Map">
+		update member set name = #{name} where user_num = #{user_num}
+	</update>
+	
+	<update id="editInfo" parameterType="java.util.Map">
+		update member set info = #{info} where user_num = #{user_num}
+	</update>
+	
+	<update id="editPasswd" parameterType="java.util.Map">
+		update member set passwd = #{passwd} where user_num = #{user_num}
+	</update>
+	
+	<update id="editPhone" parameterType="java.util.Map">
+		update member set phone_num = #{phone_num} where user_num = #{user_num}
+	</update>
+	
+	<update id="editSize" parameterType="java.util.Map">
+		update member set user_size = #{size} where user_num = #{user_num}
+	</update>
+		
+	<select id="getAddressCount" parameterType="int" resultType="int">
+		select count(*) from address where user_num = #{user_num}
+	</select>
+	
+	<select id="getAddressList" parameterType="int" resultType="addressDTO">
+		select * from address where user_num = #{user_num} order by basic desc
+	</select>
+	
+	<insert id="insertAddress" parameterType="addressDTO">
+		insert into address values(address_seq.nextval,#{user_num},#{address1},#{address2}
+		,#{address3},#{phone_num},#{name},#{basic})
+	</insert>
+	
+	<update id="setBasicNAddress" parameterType="int">
+		update address set basic = 'N' where user_num = #{user_num}
+	</update>
+	
+	<update id="setBasicYAddress" parameterType="int">
+		update address set basic = 'Y' where address_num = #{address_num}
+	</update>
+	
+	<select id="getAddressInfo" parameterType="int" resultType="addressDTO">
+		select * from address where address_num = #{address_num}
+	</select>
+	
+	<update id="editAddress" parameterType="addressDTO">
+		update address set address1 = #{address1}, address2 = #{address2}, address3 = #{address3},
+						phone_num = #{phone_num}, name = #{name} where address_num = #{address_num}
+	</update>
+	
+	<delete id="delAddress" parameterType="int">
+		delete from address where address_num = #{address_num}
+	</delete>
+	
+	<update id="delMember" parameterType="int">
+		update member set del = 'Y' where user_num = #{user_num}
+	</update>
+	
+	<select id="getCardCount" parameterType="int" resultType="int">
+		select count(*) from card where user_num = #{user_num}
+	</select>
+	
+	<insert id="insertCard" parameterType="cardDTO">
+		insert into card values(card_seq.nextval,#{user_num},#{bank_name},#{card_num},#{card_date},#{basic})
+	</insert>
+	
+	<update id="setBasicNCard" parameterType="int">
+		update card set basic = 'N' where user_num = #{user_num}
+	</update>
+	
+	<select id="getCardList" parameterType="int" resultType="cardDTO">
+		select * from card where user_num = #{user_num} order by basic desc
+	</select>
+	
+	<update id="setBasicYCard" parameterType="int">
+		update card set basic = 'Y' where myCard_num = #{myCard_num}
+	</update>
+	
+	<delete id="delCard" parameterType="int">
+		delete from card where myCard_num = #{myCard_num}
+	</delete>
+	
+	<select id="getAccount" parameterType="int" resultType="accountDTO">
+		select * from account where user_num = #{user_num}
+	</select>
+	
+	<insert id="addAccount" parameterType="accountDTO">
+		insert into account values(#{user_num},#{bank_name},#{account_num},#{account_owner})
+	</insert>
+	
+	<update id="editAccount" parameterType="accountDTO">
+		update account set bank_name = #{bank_name}, account_num = #{account_num},
+			account_owner = #{account_owner} where user_num = #{user_num}
+	</update>
+	
+	<select id="getAllInfoCartList" parameterType="int" resultType="adminAllDTO">
+		select 
+		a.user_num,b.*,c.prod_img1
+		from
+		cartList a inner join admin_prod b
+		on a.prod_num = b.prod_num
+		inner join prod_img c
+		on b.prod_group = c.prod_num
+		where a.user_num = #{user_num}
+	</select>
+	
+	<select id="buyList_cal_D" parameterType="java.util.Map" resultType="BuySellAllDTO">
+		select
+		a.*,b.prod_subject,b.prod_kr_subject,c.prod_img1
+		from
+		buy_prod a inner join admin_prod b
+		on a.prod_group = b.prod_num
+		inner join prod_img c
+		on a.prod_group = c.prod_num
+		where a.user_num = #{user_num} 
+		and a.auction = 'D'
+		and a.start_date between #{cal1} and #{cal2}
+	</select>
+	<select id="buyList_cal_notD" parameterType="java.util.Map" resultType="BuySellAllDTO">
+		select
+		a.*,b.prod_price as sell_price,c.prod_subject,d.prod_img1
+		from
+		buy_prod a inner join sell_prod b
+		on a.prod_num = b.sell_num
+		inner join admin_prod c
+		on a.prod_group = c.prod_num
+		inner join prod_img d
+		on a.prod_group = d.prod_num
+		where a.user_num = #{user_num} 
+		and a.auction in (#{a1},#{a2},#{a3})
+		and a.start_date between #{cal1} and #{cal2}
+	</select>
+	
+	<select id="buyList_all_D" parameterType="java.util.Map" resultType="BuySellAllDTO">
+		select
+		a.*,b.prod_subject,b.prod_kr_subject,c.prod_img1
+		from
+		buy_prod a inner join admin_prod b
+		on a.prod_group = b.prod_num
+		inner join prod_img c
+		on a.prod_group = c.prod_num
+		where a.user_num = #{user_num} 
+		and a.auction = 'D'
+	</select>
+	<select id="buyList_all_notD" parameterType="java.util.Map" resultType="BuySellAllDTO">
+		select
+		a.*,b.prod_price as sell_price,c.prod_subject,d.prod_img1
+		from
+		buy_prod a inner join sell_prod b
+		on a.prod_num = b.sell_num
+		inner join admin_prod c
+		on a.prod_group = c.prod_num
+		inner join prod_img d
+		on a.prod_group = d.prod_num
+		where a.user_num = #{user_num} 
+		and a.auction in (#{a1},#{a2},#{a3})
+	</select>
+	
+	<select id="sellList_cal" parameterType="java.util.Map" resultType="BuySellAllDTO">
+		select
+		a.*,b.prod_subject,b.prod_kr_subject,c.prod_img1
+		from
+		sell_prod a inner join admin_prod b
+		on a.prod_group = b.prod_num
+		inner join prod_img c
+		on a.prod_group = c.prod_num
+		where a.user_num = #{user_num} 
+		and a.auction in (#{a1},#{a2},#{a3})
+		and a.start_date between #{cal1} and #{cal2}
+	</select>
+	
+	<select id="sellList_all" parameterType="java.util.Map" resultType="BuySellAllDTO">
+		select
+		a.*,b.prod_subject,b.prod_kr_subject,c.prod_img1
+		from
+		sell_prod a inner join admin_prod b
+		on a.prod_group = b.prod_num
+		inner join prod_img c
+		on a.prod_group = c.prod_num
+		where a.user_num = #{user_num} 
+		and a.auction in (#{a1},#{a2},#{a3})
+	</select>
+	
+	<select id="getBuyInfo_D" parameterType="java.util.Map" resultType="buySellAllDTO">
+		select
+		a.*,b.*,c.prod_subject,d.prod_img1
+		from
+		buy_prod a inner join buy_info b
+		on a.buy_num = b.buy_num
+		inner join admin_prod c
+		on a.prod_group = c.prod_num
+		inner join prod_img d
+		on a.prod_group = d.prod_num
+		where a.buy_num = #{buy_num}
+	</select>
+	
+	<select id="getBuyInfo_notD" parameterType="java.util.Map" resultType="buySellAllDTO">
+		select
+		a.*,b.*,c.prod_price as sell_price,d.prod_img1,e.prod_subject
+		from
+		buy_prod a inner join buy_info b
+		on a.buy_num = b.buy_num
+		inner join sell_prod c
+		on a.prod_num = c.sell_num
+		inner join prod_img d
+		on a.prod_group = d.prod_num
+		inner join admin_prod e
+		on a.prod_group = e.prod_num
+		where a.buy_num = #{buy_num}
+	</select>
+	
+	<select id="getSellInfo" parameterType="java.util.Map" resultType="buySellAllDTO">
+		select
+		a.*,b.*,c.prod_subject,d.prod_img1
+		from
+		sell_prod a inner join sell_info b
+		on a.sell_num = b.sell_num
+		inner join admin_prod c
+		on a.prod_group = c.prod_num
+		inner join prod_img d
+		on a.prod_group = d.prod_num
+		where a.sell_num = #{sell_num}
+	</select>
+	<select id="getSellInfo_list" parameterType="java.util.Map" resultType="buySellAllDTO">
+		select
+		b.user_num,b.prod_price
+		from
+		sell_prod a inner join buy_prod b
+		on a.sell_num = b.prod_num
+		where a.sell_num = #{sell_num}
+		and b.auction = #{auction}
+	</select>
+	<select id="getSellInfo_Y" parameterType="java.util.Map" resultType="buySellAllDTO">
+		select
+		a.prod_price,e.prod_price as buy_price,f.*
+		from
+		sell_prod a inner join sell_info b
+		on a.sell_num = b.sell_num
+		inner join admin_prod c
+		on a.prod_group = c.prod_num
+		inner join prod_img d
+		on a.prod_group = d.prod_num
+		inner join buy_prod e
+		on a.sell_num = e.prod_num
+		inner join buy_info f
+		on e.buy_num = f.buy_num
+		where a.sell_num = #{sell_num}
+		and e.auction = #{auction}
+	</select>
+	
+	<update id="selectBuy" parameterType="java.util.Map">
+		update sell_prod set auction = 'Y', sell_date = #{date} where sell_num = #{sell_num}
+	</update>
+	
+	<select id="selectBuy_max" parameterType="java.util.Map" resultType="int">
+		select
+		buy_num
+		from
+		buy_prod
+		where prod_num = #{sell_num}
+		and prod_price = (select max(prod_price) from buy_prod where prod_num = #{sell_num})
+	</select>
+	<update id="selectBuy_X" parameterType="java.util.Map">
+		update buy_prod set auction = 'X' where prod_num = #{sell_num}
+	</update>
+	<update id="selectBuy_Y" parameterType="java.util.Map">
+		update buy_prod set auction = 'Y',buy_date = #{date} where buy_num = #{buy_num}
+	</update>
+	<select id="selectBuy_info" parameterType="java.util.Map" resultType="int">
+		select buyInfo_num from buy_info where buy_num = #{buy_num}
+	</select>
+	<update id="selectBuy_sell" parameterType="java.util.Map">
+		update sell_info set buyInfo_num = #{buyInfo_num} where sell_num = #{sell_num}
+	</update>
+	
+	<select id="getPoint" parameterType="int" resultType="int">
+		select point from member where user_num = #{user_num}
+	</select>
+	
+	<select id="getPointList" parameterType="int" resultType="buySellAllDTO">
+		select
+		a.*,b.prod_subject
+		from
+		buy_prod a inner join admin_prod b
+		on a.prod_num = b.prod_num
+		where a.user_num = #{user_num} and a.auction = 'D'
+		order by buy_date desc
+	</select>
+	<select id="getAuctionSalesInfo" parameterType="int" resultType="salesAllDTO">
+		select
+		a.sell_num as prod_num,a.user_num, b.prod_subject, b.prod_kr_subject,b.prod_gender as gender
+		from
+		sell_prod a inner join admin_prod b
+		on a.prod_group = b.prod_num
+		where a.sell_num = #{sell_num}
+	</select>
+	<select id="selectBuyPrice" parameterType="int" resultType="int">
+		select prod_price from buy_prod where buy_num = #{buy_num}
+	</select>
+	<insert id="auctionSales" parameterType="salesAllDTO">
+		insert into sales values(sales_seq.nextval,'in',#{reg_date},#{prod_num},1,#{prod_subject},#{prod_kr_subject},#{gender},'charge',#{money},#{user_num})
+	</insert>
+	<select id = "getBuyAuctionList" parameterType = "int" resultType = "BuyProdDTO">
+		select * from buy_prod where prod_num = #{sell_num}
+	</select>
+	<select id = "getMax_Price" parameterType = "int" resultType = "int">
+		select prod_price from buy_prod where buy_num = #{buy_num}
+	</select>
+ </mapper>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

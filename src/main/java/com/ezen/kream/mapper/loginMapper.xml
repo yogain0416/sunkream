@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.ezen.kream.mapper.loginMapper">
+ 	<insert id="newMember" parameterType="MemberDTO">
+ 		insert into member values(member_seq.nextval,
+ 		#{email},#{passwd},#{user_size},#{profile_name},#{name},#{phone_num},#{birth},#{gender},
+ 		#{profile_img},#{point},0,#{info},'','N','')
+ 	</insert>
+ 	
+ 	<select id="loginCheck" parameterType="Map" resultType="int">
+ 		select count (*) from member where lower(email)=lower(#{email}) and passwd=#{passwd} and del = 'N'
+ 	</select>
+ 	
+ 	<select id="findId" parameterType="String" resultType="String">
+ 		select email from member where phone_num = #{phoneNum} and del = 'N'
+ 	</select>
+ 	
+ 	<select id="findPw" parameterType="Map" resultType="MemberDTO">
+ 		select *from member where lower(email)=lower(#{email}) and phone_num=#{phoneNum} and del = 'N'
+ 	</select>
+ 	
+ 	<update id="changePw" parameterType="MemberDTO">
+ 		update member set passwd=#{passwd} where user_num=#{user_num} and del = 'N'
+ 	</update>
+ 	
+ 	<select id="socialCheckMember" parameterType="String" resultType="int">
+ 		select count (*) from member where lower(email)=lower(#{email}) and del = 'N'
+ 	</select>
+ 	
+ 	<select id="checkProfileName" parameterType="String" resultType="int">
+ 		select count (*) from member where upper(profile_name)=upper(#{str}) and del = 'N'
+ 	</select>
+ 	
+ 	<select id="checkPhoneNum" parameterType="String" resultType="int">
+ 		select count (*) from member where phone_num=#{phoneNum} and del = 'N'
+ 	</select>
+ 	
+ 	<select id="getMember" parameterType="String" resultType="MemberDTO">
+ 		select *from member where lower(email)=lower(#{email}) and del = 'N'
+ 	</select>
+ </mapper>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

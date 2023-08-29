@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ezen.kream.mapper.adminBoardMapper">
+	<select id="QnABoardList" parameterType="java.util.Map"
+		resultType="qnaboardAllDTO">
+		select
+		*
+		from
+		(select rownum rn, A.* from
+		(select * from
+		qna_board where qna_cate = #{qna_cate} order by qna_step
+		desc,qna_num)A)
+		where
+		qna_cate = #{qna_cate} and rn between #{start} and #{end}
+	</select>
+
+	<select id="QnABoardListProcess" parameterType="java.util.Map"
+		resultType="qnaBoardAllDTO">
+		select * from (select rownum rn, A.* from
+		(select * from
+		qna_board
+		where qna_cate = '1:1문의' and qna_process = #{process} order
+		by qna_step desc , qna_num asc,qna_num)A)
+		where qna_process = #{process}
+		and rn between
+		#{start} and #{end}
+	</select>
+
+	<insert id="QnACateInput" parameterType="QnACateDTO">
+		insert into qna_cate
+		values(qna_cate_seq.nextval,#{qna_cate},#{qna_subCate})
+	</insert>
+
+	<select id="QnACateList" resultType="QnACateDTO">
+		select * from qna_cate order
+		by qna_cate desc
+	</select>
+
+	<delete id="QnACateDelete" parameterType="int">
+		delete from qna_cate
+		where qna_cate_num = #{qna_cate_num}
+	</delete>
+
+	<select id="getQnACate" resultType="String">
+		select distinct qna_cate from
+		qna_cate
+	</select>
+
+	<select id="getQnASubCate" parameterType="String"
+		resultType="QnACateDTO">
+		select*from qna_cate where qna_cate = #{qna_cate}
+	</select>
+
+<!-- 	<update id="inputStep">
+		update qna_board set qna_step = qna_step + 1
+	</update> -->
+
+	<insert id="QnABoardInput" parameterType="QnABoardDTO">
+		insert into qna_board
+		values(qna_board_seq.nextval,#{user_num},qna_board_seq.nextval,#{qna_cate},#{qna_subCate}
+		,#{qna_subject},#{qna_contents},'0','관리자글',#{reg_date},'N')
+	</insert>
+
+	<select id="sysdate" resultType="String">
+		select to_char(sysdate,'YY/MM/DD HH24:MI:SS') from dual
+	</select>
+
+	<select id="getQnABoard" parameterType="int"
+		resultType="QnABoardDTO">
+		select * from qna_board where qna_num = #{qna_num}
+	</select>
+
+	<delete id="QnABoardDelete" parameterType="int">
+		delete from qna_board
+		where qna_num = #{qna_num}
+	</delete>
+
+	<update id="QnABoardEdit" parameterType="QnABoardDTO">
+		update qna_board set
+		qna_cate=#{qna_cate}, qna_subCate=#{qna_subCate},
+		qna_subject=#{qna_subject},
+		qna_contents=#{qna_contents} 
+		where qna_num = #{qna_num}
+	</update>
+
+<!-- 	<update id="askStep" parameterType="int">
+		update qna_board set qna_step
+		= qna_step + 1 where qna_step > #{qna_step}
+	</update> -->
+
+	<insert id="askReply" parameterType="QnABoardDTO">
+		insert into qna_board
+		values(qna_board_seq.nextval,#{user_num},#{qna_num},#{qna_cate},#{qna_subCate}
+		,#{qna_subject},#{qna_contents},#{report_num},'답변',#{reg_date},'Y')
+	</insert>
+
+	<update id="askReplyEdit" parameterType="QnABoardDTO">
+		update qna_board set
+		qna_subject = #{qna_subject},
+		qna_contents=#{qna_contents},qna_process='답변'
+		where qna_num =
+		#{qna_num}
+	</update>
+
+	<update id="editProcess" parameterType="QnABoardDTO">
+		update qna_board set
+		qna_process =#{qna_process} where qna_step = #{qna_step}-1
+	</update>
+
+	<update id="processCommit" parameterType="QnABoardDTO">
+		update qna_board set
+		qna_process = #{qna_process} where qna_num = #{qna_num}
+	</update>
+
+	<select id="getQnANum" parameterType="QnABoardDTO"
+		resultType="int">
+		select qna_num from qna_board where reg_date = #{reg_date}
+	</select>
+
+	<insert id="QnAImgInput" parameterType="QnAImgDTO">
+		insert into qna_img
+		values(#{qna_num},#{user_num},#{qna_img})
+	</insert>
+
+	<select id="getQnAImg" parameterType="int"
+		resultType="QnAImgDTO">
+		select * from qna_img where qna_num = #{qna_num}
+	</select>
+
+	<delete id="QnAImgDelete" parameterType="QnAImgDTO">
+		delete from qna_img
+		where qna_num=#{qna_num} and user_num=#{user_num} and
+		qna_img=#{qna_img}
+	</delete>
+	
+	<delete id="QnAImgDeleteAll" parameterType="int">
+		delete from qna_img where qna_num = #{qna_num}
+	</delete>
+
+	<select id="styleBoardList" resultType="StyleBoardDTO">
+		select * from style_board
+	</select>
+
+	<select id="styleBoardAllList" parameterType="styleBoardDTO"
+		resultType="styleBoardAllDTO">
+		select
+		a.style_num,a.user_num,a.style_contents,a.style_like,a.reg_date
+		,c.profile_name,b.style_img1,b.style_img2,b.style_img3,b.style_img4,b.style_img5
+		from(style_Board a inner join style_img b on a.style_num=b.style_num)
+		inner join member c on a.user_num=b.user_num where
+		a.style_num =
+		#{style_num} and a.user_num= #{user_num}
+	</select>
+
+	<update id="setPenalty" parameterType="java.util.Map">
+		update member set penalty = penalty+1 , admin_info = #{admin_info} where user_num =
+		#{report_num}
+	</update>
+
+	<select id="getAdminInfo" parameterType="int"
+		resultType="string">
+		select admin_info from member where user_num = #{user_num}
+	</select>
+
+	<select id="getPickHashTagList" resultType="pickHashTagDTO">
+		select * from
+		pick_hashTag
+	</select>
+
+	<insert id="addPickHashTag" parameterType="String">
+		insert into
+		pick_hashTag values(pick_hashTag_seq.nextval,#{pick_name})
+	</insert>
+
+	<insert id="plusPickHashTag" parameterType="String">
+		insert into
+		hashTagBase values(hashTag_seq.nextval,#{pick_name},0)
+	</insert>
+
+	<select id="checkPickHashTag" parameterType="String"
+		resultType="int">
+		select count(*) from pick_hashTag where pick_name =
+		#{pick_name}
+	</select>
+
+	<delete id="delPickHashTag" parameterType="int">
+		delete from
+		pick_hashTag where pick_num = #{num}
+	</delete>
+
+	<select id="checkSubCate" parameterType="java.util.Map"
+		resultType="int">
+		select count(*) from qna_cate where qna_cate = #{qna_cate}
+		and qna_subCate = #{qna_subCate}
+	</select>
+
+	<select id="getPickSearchList" resultType="pickSearchDTO">
+		select * from
+		pick_search
+	</select>
+
+	<select id="checkPickSearch" parameterType="String"
+		resultType="int">
+		select count(*) from pick_search where search_name =
+		#{search_name}
+	</select>
+
+	<insert id="addPickSearch" parameterType="String">
+		insert into pick_search
+		values(pick_search_seq.nextval,#{search_name})
+	</insert>
+
+	<delete id="delPickSearch" parameterType="int">
+		delete from pick_search
+		where search_num = #{num}
+	</delete>
+
+	<select id="getQnABoardCount" parameterType="java.util.Map"
+		resultType="int">
+		select count(*) from qna_board where qna_cate = #{qna_cate}
+	</select>
+
+	<select id="agetQnABoardCount" parameterType="java.util.Map"
+		resultType="int">
+		select count(*) from qna_board where qna_cate = #{qna_cate}
+		and qna_process = #{process}
+	</select>
+
+	<select id="getQnABoardFindProfileCount"
+		parameterType="java.util.Map" resultType="int">
+		select count(*)
+		from
+		qna_board a inner join member b
+		on a.user_num = b.user_num
+		where qna_cate =
+		#{qna_cate}
+		and ${search} like #{searchString}
+	</select>
+
+	<select id="getQnABoardFindCount" parameterType="java.util.Map"
+		resultType="int">
+		select count(*) from qna_board where qna_cate = #{qna_cate}
+		and ${search} like #{searchString}
+	</select>
+
+	<select id="agetQnABoardFindCount" parameterType="java.util.Map"
+		resultType="int">
+		select
+		count(*)
+		from
+		qna_board
+		where qna_cate = #{qna_cate}
+		and
+		qna_process = #{process} and ${search} like #{searchString}
+	</select>
+
+	<select id="agetQnABoardFindProfileCount"
+		parameterType="java.util.Map" resultType="int">
+		select
+		count(*)
+		from
+		qna_board a
+		inner join member b on a.user_num = b.user_num
+		where
+		a.qna_cate = #{qna_cate} and a.qna_process = #{process}
+		and b.profile_name like
+		#{searchString}
+	</select>
+
+	<select id="QnABoardFindProfileList"
+		parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+		select
+		C.*
+		from (select rownum rn, A.*,B.profile_name as qna_writer from
+		((select
+		* from qna_board where qna_cate = '1:1문의' order by qna_step asc)A
+		inner join (select * from member where profile_name like
+		#{searchString})B ON A.user_num = B.user_num))C
+		where rn between #{start} and #{end}
+	</select>
+	<select id="QnABoardFindList" parameterType="java.util.Map"
+		resultType="qnaBoardAllDTO">
+		select
+		*
+		from
+		(select rownum rn, A.* from
+		(select * from qna_board where qna_cate =
+		#{qna_cate}
+		and ${search} like #{searchString} order by qna_step,qna_num
+		asc)A)
+		where rn
+		between #{start} and #{end}
+	</select>
+
+	<select id="QnABoadFindListProfileProcess"
+		parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+		select
+		C.*
+		from (select rownum rn, A.*,B.profile_name from
+		((select * from
+		qna_board
+		where qna_cate = '1:1문의' and qna_process = #{process}
+		order by qna_step asc)A
+		inner join (select * from member where profile_name
+		like #{searchString})B ON A.user_num = B.user_num))C
+		where rn between
+		#{start} and #{end}
+	</select>
+
+	<select id="QnABoardFindListProcess"
+		parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+		select * from (select rownum
+		rn, A.* from
+		(select * from qna_board
+		where qna_cate = '1:1문의' and
+		qna_process = #{process}
+		and ${search} like #{searchString} order by qna_step asc,qna_num)A)
+		where
+		qna_process = #{process} and ${search} like #{searchString}
+		and rn
+		between #{start} and #{end}
+	</select>
+
+	<select id="countPickHashTag" resultType="int">
+		select count(*) from
+		pick_hashTag
+	</select>
+
+	<select id="countPickSearch" resultType="int">
+		select count(*) from
+		pick_search
+	</select>
+	<select id = "getQnAReplyNum" parameterType = "QnABoardDTO" resultType = "int">
+		select qna_num from qna_board where qna_step = #{qna_num} and qna_num != #{qna_num} and qna_subject = #{qna_subject} and qna_contents = #{qna_contents}
+	</select>
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.ezen.kream.mapper.userCSMapper">
+ 
+ 	<select id="announceList" resultType="qnaBoardDTO">
+ 		select * from qna_board where qna_cate = '공지' order by qna_step desc
+ 	</select>
+ 	
+ 	<select id="faqList" parameterType="String" resultType="qnaBoardDTO">
+ 		select * from 
+ 		(select rownum rn,A.* from
+ 		(select * from qna_board where qna_cate = 'FAQ' 
+ 		and qna_subCate = #{qna_subCate} order by qna_step desc)A)
+ 		where rn between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="faqAllList" resultType="qnaBoardDTO">
+ 		select * from 
+ 		(select rownum rn,A.* from 
+ 		(select * from qna_board where qna_cate = 'FAQ' order by qna_step desc)A)
+ 		where rn between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="faqSubList" resultType="String">
+ 		select distinct qna_subCate from qna_cate where qna_cate = 'FAQ' order by qna_subCate asc 	
+ 	</select>
+ 	
+ 	<select id="faqSearch" parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+ 		select * from
+ 		(select rownum rn,A.* from
+ 		(select * from qna_board 
+ 		where qna_cate = #{qna_cate} and (qna_subject like #{searchString} or qna_contents like #{searchString})
+ 		order by qna_step desc,qna_num)A)
+ 		where rn between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="qnaList" parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+ 		select * from 
+ 		(select rownum rn,A.* 
+ 		from(select * from qna_board 
+ 		where qna_cate=#{qna_cate} and user_num = #{user_num} order by qna_step desc ,qna_num)A)
+ 		where rn between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="getQnaSubCate" resultType="String">
+ 		select qna_subCate from qna_cate where qna_cate = '1:1문의' order by qna_subCate 
+ 	</select>
+ 	
+ 	<insert id="qnaWrite" parameterType="qnaBoardDTO">
+ 		insert into qna_board values(qna_board_seq.nextval,#{user_num},qna_board_seq.nextval,#{qna_cate},#{qna_subCate}
+ 									,#{qna_subject},#{qna_contents},#{report_num},'대기중',#{reg_date},'N')
+ 	</insert>
+ 	
+ 	<select id="getReportName" parameterType="int" resultType="String">
+ 		select profile_name from member where user_num = #{report_num}
+ 	</select>
+ 	
+ 	<select id="qnaSearch" parameterType="java.util.Map" resultType="qnaBoardDTO">
+ 		select * from qna_board where user_num = #{user_num} and (qna_subject like #{searchString} or qna_contents like #{searchString})
+ 	</select>
+ 	
+ 	<select id="getUserQnACount" parameterType="String" resultType="int">
+ 		select count(*) from qna_board where qna_cate = #{qna_cate}
+ 	</select>
+ 	
+ 	<select id="userQnAList" parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+ 		select * from 
+ 		(select rownum rn,A.* from
+ 		(select * from qna_board 
+ 		where qna_cate = #{qna_cate} order by qna_step desc,qna_num)A)
+ 		where rn between #{start} and #{end}
+ 	</select>
+ 	
+ 	<select id="getUserFaqSubCateCount" parameterType="java.util.Map" resultType="int">
+ 		select count(*) from qna_board where qna_cate = #{qna_cate} and qna_subCate = #{qna_subCate}
+ 	</select>
+ 	
+ 	<select id="getUserFaqAllCount" parameterType="java.util.Map" resultType="int">
+ 		select count(*) from qna_board where qna_cate = #{qna_cate}
+ 	</select>
+ 	
+ 	<select id="getUserSearchCount" parameterType="java.util.Map" resultType="int">
+ 		select count(*) from qna_board where qna_cate = #{qna_cate} 
+ 		and (qna_subject like #{searchString} or qna_contents like #{searchString})
+ 	</select>
+ 	
+ 	<select id="getUserAskCount" parameterType="java.util.Map" resultType="int">
+ 		select count(*) from qna_board where qna_cate = #{qna_cate} and user_num = #{user_num}
+ 	</select>
+ 	
+ 	<select id="getUserAskSearchCount" parameterType="java.util.Map" resultType="int">
+ 		select count(*) from qna_board where qna_cate = #{qna_cate} and user_num = #{user_num}
+ 		and (qna_subject like #{searchString} or qna_contents like #{searchString})
+ 	</select>
+ 	
+ 	<select id="askSearch" parameterType="java.util.Map" resultType="qnaBoardAllDTO">
+ 		select * from
+ 		(select rownum rn,A.* from 
+ 		(select * from qna_board where qna_cate = #{qna_cate} and user_num = #{user_num}
+ 		and (qna_subject like #{searchString} or qna_contents like #{searchString})
+ 		order by qna_step desc)A)
+ 		where rn between #{start} and #{end}
+ 	</select>
+ </mapper>

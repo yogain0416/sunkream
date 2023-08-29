@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ezen.kream.mapper.userShopMapper">
+	<select id="shopCateList" resultType="ProdCateDTO">
+		select * from prod_cate
+	</select>
+	<select id="shopProdList" resultType="AdminAllDTO">
+		select A.*,B.* from
+		admin_prod A inner join prod_img B on A.prod_num = B.prod_num where
+		A.prod_size = '0' and A.del = 'N'
+		order by prod_kr_subject
+	</select>
+	<select id="shopBrandList" parameterType="String" resultType="ProdCateDTO">
+		select 
+		cate_brand,cate_kr_brand 
+		from prod_cate 
+		where cate_type=#{cate} 
+		group by cate_brand,cate_kr_brand 
+		order by cate_brand
+	</select>
+	
+	<select id="shopAllBrandList" resultType="ProdCateDTO">
+		select 
+		cate_brand,cate_kr_brand 
+		from prod_cate 
+		group by cate_brand,cate_kr_brand 
+		order by cate_brand
+	</select>
+	
+	<select id="shopSubCateList" parameterType="String" resultType="ProdCateDTO">
+		select 
+		cate_subtype,cate_kr_subtype 
+		from prod_cate 
+		where cate_type=#{cate} 
+		group by cate_subtype,cate_kr_subtype
+		order by cate_kr_subType
+	</select>
+	
+	<select id="shopAllSubCateList" resultType="ProdCateDTO">
+		select cate_type,cate_subtype,cate_kr_subtype from prod_cate group by cate_type,cate_subtype,cate_kr_subtype
+	</select>
+	
+	<select id="getCateList" resultType="prodCateDTO">
+		select * from prod_cate
+	</select>
+	
+	<select id="getSearchProd" parameterType="String" resultType="adminAllDTO">
+		select A.*,B.* from admin_prod A INNER JOIN prod_img B
+		ON A.prod_num = B.prod_num 
+		where (A.prod_kr_subject like #{searchString} and A.del = 'N' and A.prod_size ='0') 
+		or
+		(upper(A.prod_subject) like upper(#{searchString}) and A.del = 'N' and A.prod_size ='0')
+		order by A.prod_kr_subject 
+	</select>
+	
+	<select id="getSearchList" parameterType="String" resultType="prodSearchDTO">
+		 select 
+		 a.prod_num,
+		 b.prod_img1,
+  		 case when replace(upper(a.prod_subject),' ','') like replace(upper(#{searchString}),' ','') then a.prod_subject
+  		 when replace(upper(prod_kr_subject),' ','') like replace(upper(#{searchString}),' ','') then a.prod_kr_subject
+  		 end as subject
+  		 from 
+  		 (admin_prod a inner join prod_img b
+  		 on a.prod_num = b.prod_num)
+  		 where (replace(upper(a.prod_subject),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(prod_kr_subject),' ','') like replace(upper(#{searchString}),' ',''))
+  		 and a.del = 'N' and a.prod_size ='0'
+  		 order by a.prod_kr_subject
+	</select>
+	
+ 	<select id="popCheck" parameterType="String" resultType="int">
+		select count(*) from pop_search where search_string = #{searchString}
+	</select>
+	
+	<insert id="addPopSearchString" parameterType="String">
+		insert into pop_search values(pop_search_seq.nextval,#{searchString},1)
+	</insert>
+	
+	<update id="plusPopSearchString" parameterType="String">
+		update pop_search set search_count = search_count + 1 where search_string = #{searchString}
+	</update>
+	
+	<select id="getPopSearchList" resultType="PopSearchDTO">
+		select * from pop_search order by search_count desc
+	</select> 
+	<select id="getDelSearchList" parameterType="String"
+		resultType="prodSearchDTO">
+		select
+		a.prod_num,
+		b.prod_img1,
+		case when replace(upper(a.prod_subject),' ','') like
+		replace(upper(#{searchString}),' ','') then a.prod_subject
+		when replace(upper(prod_kr_subject),' ','') like
+		replace(upper(#{searchString}),' ','') then a.prod_kr_subject
+		end as subject
+		from
+		(admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num)
+		where (replace(upper(a.prod_subject),' ','') like
+		replace(upper(#{searchString}),' ','')
+		or replace(upper(prod_kr_subject),' ','') like
+		replace(upper(#{searchString}),' ',''))
+		and a.del = 'Y' and a.prod_size ='0'
+		order by a.prod_kr_subject
+	</select>
+	<select id="genderSearchList" parameterType="Map" resultType="prodSearchDTO">
+       select 
+       a.prod_num,
+       b.prod_img1,
+         case when replace(upper(a.prod_subject),' ','') like replace(upper(#{searchString}),' ','') then a.prod_subject
+         when replace(upper(prod_kr_subject),' ','') like replace(upper(#{searchString}),' ','') then a.prod_kr_subject
+         end as subject
+         from 
+         (admin_prod a inner join prod_img b
+         on a.prod_num = b.prod_num)
+         where (replace(upper(a.prod_subject),' ','') like replace(upper(#{searchString}),' ','') 
+         or replace(upper(prod_kr_subject),' ','') like replace(upper(#{searchString}),' ',''))
+         and a.del = 'N' and a.prod_size ='0' and a.prod_gender = #{gender}
+         order by a.prod_kr_subject
+   </select>
+   <select id = "getSizeList" parameterType = "int" resultType = "AdminAllDTO">
+   		select A.*,B.* from admin_prod A inner join prod_img B on A.prod_group = B.prod_num 
+   		where A.prod_group = #{prod_num} and A.prod_size != '0'
+   		order by A.prod_num
+   </select>
+   <select id="buySellSizeSelect" parameterType = "AdminAllDTO" resultType = "AdminAllDTO">
+   		select A.*,B.* 
+   		from admin_prod A inner join prod_img B 
+   		on A.prod_group = B.prod_num 
+   		where A.prod_group = #{prod_num} and A.prod_size = #{prod_size}
+   </select>
+   <select id="buySellCartUser" parameterType = "int" resultType = "AdminAllDTO">
+   		select A.*,B.* 
+   		from admin_prod A inner join prod_img B 
+   		on A.prod_group = B.prod_num 
+   		where A.prod_num = #{prod_num}
+   </select>
+   <select id = "getUserAddress" parameterType = "int" resultType = "AddressDTO">
+   		select * from address where user_num = #{user_num} order by basic desc
+   </select>
+	<select id ="getCard" parameterType = "int" resultType = "CardDTO">
+		select * from card where user_num = #{user_num}
+	</select>
+	<select id="getBuyNum" parameterType="BuyAllDTO" resultType="int">
+		select buy_num from buy_prod
+		where start_date = #{start_date} and user_num = #{user_num} and prod_num = #{prod_num}
+	</select>
+	<insert id = "insertBuyDirect" parameterType = "BuyAllDTO">
+      insert into buy_prod values(buy_prod_seq.nextval,#{prod_num},#{user_num},#{prod_group}
+         ,#{start_date},#{prod_size},#{prod_price}
+         ,#{start_date},#{auction},#{point})
+   </insert>
+   <insert id = "insertBuyInfoDirect" parameterType = "BuyAllDTO">
+      insert into buy_info values(buyInfo_seq.nextval,#{buy_num},#{user_num},#{prod_group}
+      	,#{name},#{phone_num},#{address1},#{address2},#{address3}
+      	,#{bank_name},#{card_num},#{card_date},#{needs})
+   </insert>
+	<update id = "buy_qty" parameterType = "int">
+		update admin_prod set prod_qty = prod_qty - 1 where prod_num = #{buy_num}
+	</update>
+	
+	<select id="checkSell" parameterType="int" resultType="String">
+		select prod_size from sell_prod where prod_group = #{prod_num} and auction = 'W'
+	</select>
+	
+	
+	<select id="getCartSizeList" parameterType="int" resultType="adminAllDTO">
+ 		select * from admin_prod where prod_group = #{prod_group} and prod_size != '0' order by prod_size asc
+ 	</select>
+ 	
+ 	<select id="agetCartList" parameterType="int" resultType="cartListDTO">
+ 		select * from cartList where user_num = #{user_num}
+ 	</select>
+ 	<insert id="addCart" parameterType="java.util.Map">
+ 		insert into cartList values(#{user_num},#{prod_num},#{prod_group})
+ 	</insert>
+ 	<delete id="delCart" parameterType="java.util.Map">
+ 		delete from cartList where user_num = #{user_num} and prod_num = #{prod_num}
+ 	</delete>
+	
+	<select id="selectSellSize" parameterType="java.util.Map" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_group = b.prod_num
+		where a.prod_group = #{prod_group} and a.prod_size = #{prod_size}
+	</select>
+	
+	<select id="getAccountInfo" parameterType="int" resultType="accountDTO">
+		select * from account where user_num = #{user_num}
+	</select>
+	
+	<insert id="addSellProd" parameterType="sellAllDTO">
+		insert into sell_prod values(prod_seq.nextval,#{prod_group},#{user_num},#{prod_size},#{prod_price}
+			,#{start_date},#{end_date},'',#{auction})
+	</insert>
+	
+	<select id="getSellNum" parameterType="sellAllDTO" resultType="int">
+		select sell_num from sell_prod where start_date = #{start_date} and user_num = #{user_num}
+	</select>
+	
+	<insert id="addSellInfo" parameterType="sellAllDTO">
+		insert into sell_info values(sellInfo_seq.nextval,#{sell_num},#{user_num},#{prod_group}
+			,#{name},#{phone_num},#{address1},#{address2},#{address3},#{bank_name},#{account_num}
+			,#{account_owner},'')
+	</insert>
+	
+	<update id="usingPoint" parameterType="buyAllDTO">
+		update member set point = point - #{point} where user_num = #{user_num}
+	</update>
+	
+	<select id="selectBuyAuction" parameterType="java.util.Map" resultType="BuySellAllDTO">
+		select
+		a.*,b.prod_subject,b.prod_kr_subject,c.prod_img1
+		from
+		sell_prod a inner join admin_prod b
+		on a.prod_group = b.prod_num
+		inner join prod_img c
+		on a.prod_group = c.prod_num
+		where a.prod_group = #{prod_group}
+		and a.prod_size = #{prod_size}
+		and a.auction = 'W'
+	</select>
+	
+	<select id="getCountMember" parameterType="java.util.Map" resultType="int">
+		select count(*) from buy_prod where prod_num = #{sell_num}
+	</select>
+	
+	<select id="getMaxPrice" parameterType="java.util.Map" resultType="int">
+		select max(prod_price) from buy_prod where prod_num = #{sell_num}
+	</select>
+	
+	<insert id="addBuyAuctionProd" parameterType="buySellAllDTO">
+		insert into buy_prod values(buy_prod_seq.nextval,#{prod_num}
+			,#{user_num},#{prod_group},#{start_date},#{prod_size},#{prod_price},'',#{auction},'0')
+	</insert>
+	<select id="getBuyAuctionNum" parameterType="buySellAllDTO" resultType="int">
+		select buy_num from buy_prod
+		where prod_num = #{prod_num} and user_num = #{user_num} and start_date = #{start_date}
+	</select>
+	<insert id="addBuyInfoAuctionProd" parameterType="buySellAllDTO">
+		insert into buy_info values(buyInfo_seq.nextval,#{buy_num},#{user_num},#{prod_num}
+			,#{name},#{phone_num},#{address1},#{address2},#{address3}
+			,#{bank_name},#{account_num},#{account_owner},#{needs})
+	</insert>
+	
+	<update id="plusPoint" parameterType="java.util.Map">
+		update member set point = point + #{point} where user_num = #{user_num}
+	</update>
+	
+	
+	<select id="getProdNames" parameterType="buyAllDTO" resultType="buyAllDTO">
+		select prod_subject,prod_kr_subject,prod_gender as gender from
+		admin_prod where prod_num = #{prod_num}
+	</select>
+	<insert id="directIncome" parameterType="buyAllDTO">
+		insert into sales values(sales_seq.nextval,'in',#{start_date},#{prod_num},1
+			,#{prod_subject},#{prod_kr_subject},#{gender},'direct',#{prod_price}-#{point},#{user_num})
+	</insert>
+	
+	<select id="cartCount" parameterType="int" resultType="int">
+		select
+		count(*) 
+		from
+		admin_prod a inner join cartList b
+		on a.prod_num = b.prod_num
+		where a.prod_group = #{prod_num}
+	</select>
+	
+	<select id="tagCount" parameterType="int" resultType="int">
+		select
+		count(*)
+		from
+		admin_prod a inner join prodTag b
+		on a.prod_num = b.prod_num
+		where a.prod_num = #{prod_num}
+	</select>
+	
+	<select id="getProdInfo" parameterType="int" resultType="adminAllDTO">
+		select 
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_group = b.prod_num
+		where a.prod_num = #{prod_group}
+	</select>
+	
+	<select id="showTagStyle" parameterType="int" resultType="styleBoardAllDTO">
+		select
+		a.style_num,a.user_num,a.style_contents,a.style_like,a.reg_date,c.profile_img,c.profile_name,b.style_img1,b.style_img2,b.style_img3,b.style_img4,b.style_img5
+		from
+		style_Board a inner join style_img b 
+		on a.style_num = b.style_num
+		inner join member c 
+		on a.user_num = c.user_num 
+		where 
+		a.style_num in (select style_num from prodTag where prod_num = #{prod_group})
+		and c.del = 'N'
+		order by a.reg_date desc
+	</select>
+	
+	<select id="shopTypeList" parameterType="String" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.cate_kr_type = #{cate_kr_type}
+		and a.del = 'N'
+		order by a.prod_kr_subject
+	</select>
+	
+	<select id="shopSubTypeList" parameterType="String" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.cate_kr_subType = #{cate_kr_subType}
+		and a.del = 'N'
+		order by a.prod_kr_subject
+	</select>
+	
+	<select id="shopListBrandList" parameterType="String" resultType="adminAllDTO" >
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.cate_brand = #{cate_brand}
+		and a.del = 'N'
+		order by a.prod_kr_subject
+	</select>
+	
+	<select id="shopProdSizeProdGroup" parameterType="String" resultType="int">
+		select
+		prod_group
+		from
+		admin_prod
+		where del = 'N'
+		and prod_size = #{prod_size}
+		and prod_qty != 0
+	</select>
+	<select id="shopProdSizeList" parameterType="java.util.List" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.prod_num in
+		<foreach collection='list' index='index' item='prod_group' open='(' close=')' separator=','>
+		#{prod_group}
+		</foreach>
+		order by a.prod_kr_subject
+	</select>
+	
+	<select id="shopProdGenderList" parameterType="String" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.prod_gender = #{prod_gender}
+		and a.del = 'N'
+		order by a.prod_kr_subject
+	</select>
+</mapper>

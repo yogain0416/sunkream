@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace = "com.ezen.kream.mapper.userHomeMapper">
+ 	<select id = "userTabList" resultType = "String">
+ 		select distinct tab_name from pickCate_list
+ 	</select>
+ 	<select id = "userTabTypeList" resultType ="PickCateListDTO" parameterType ="String">
+ 		select distinct pick_name,pick_kr_name,cate_num from pickCate_list where tab_name = #{tab_name} order by cate_num desc
+ 	</select>
+ 	<select id = "userHomeList" parameterType = "String" resultType = "AdminAllDTO">
+ 		select A.*,D.*,C.* from 
+ 		(admin_prod A inner join pickProd_list B on A.prod_num = B.prod_num 
+ 		inner join prod_img C on A.prod_num = C.prod_num )
+ 		inner join pickCate_list D on D.cate_num = B.cate_num 
+ 		where D.pick_name = #{pick_name} and a.del = 'N'
+ 	</select>
+ 	<select id = "userMainCate" resultType = "PickCateListDTO">
+ 		select distinct pick_name,pick_kr_name from pickCate_list
+ 	</select>
+ 	
+ 	
+ 	<!-- 기간지난 경매상품 취소 -->
+ 	<select id="cancelSellProdNum" resultType="int">
+ 		select sell_num from sell_prod where auction = 'W' 
+ 			and end_date between '23/01/01 00:00:00' and to_char(sysdate,'YY/MM/DD HH24:MI:SS')
+ 	</select>
+ 	<update id="cancelBuyProd" parameterType="int">
+ 		update buy_prod set auction ='X' where prod_num = #{sell_num}
+ 	</update>
+ 	<update id="cancelSellProd">
+ 		update sell_prod set auction = 'X' where auction = 'W' 
+ 			and end_date between '23/01/01 00:00:00' and to_char(sysdate,'YY/MM/DD HH24:MI:SS')
+ 	</update>
+ 	
+ 	
+ 	
+ 	
+ </mapper>
+ 

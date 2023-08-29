@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ezen.kream.mapper.adminProdMapper">
+	<insert id="prodCateInput" parameterType="ProdCateDTO">
+		insert into prod_cate
+		values(prod_cate_seq.nextval,initcap(#{cate_brand}),#{cate_kr_brand},initcap(#{cate_type}),#{cate_kr_type},initcap(#{cate_subType}),#{cate_kr_subType})
+	</insert>
+	<insert id="prodBaseInput" parameterType="AdminProdDTO">
+		insert into admin_prod
+		values(prod_seq.nextval,prod_seq.nextval,initcap(#{prod_name}),#{prod_kr_name},initcap(#{cate_brand}),#{cate_kr_brand},initcap(#{cate_type}),#{cate_kr_type},initcap(#{cate_subType}),#{cate_kr_subType},initcap(#{prod_subject}),#{prod_kr_subject},0,initcap(#{prod_color}),#{prod_kr_color},#{prod_price},#{prod_qty},#{prod_gender},0,to_char(sysdate,'yy/mm/dd/
+		HH24:MI:SS'),'N')
+	</insert>
+	<insert id="prodInput" parameterType="AdminProdDTO">
+		insert into admin_prod
+		values(prod_seq.nextval,#{prod_group},initcap(#{prod_name}),#{prod_kr_name},initcap(#{cate_brand}),#{cate_kr_brand},initcap(#{cate_type}),#{cate_kr_type},initcap(#{cate_subType}),#{cate_kr_subType},initcap(#{prod_subject}),#{prod_kr_subject},#{prod_size},initcap(#{prod_color}),#{prod_kr_color},#{prod_price},#{prod_qty},#{prod_gender},0,to_char(sysdate,'yy/mm/dd
+		HH24:MI:SS'),'N')
+	</insert>
+	<update id="prodDelete" parameterType="int">
+		update admin_prod set del
+		= 'Y' where prod_group = #{prod_num}
+	</update>
+	<insert id="prodImgInput" parameterType="ProdImgDTO">
+		insert into prod_img
+		values(#{prod_num},#{prod_img1},#{prod_img2},#{prod_img3},#{prod_img4},#{prod_img5})
+	</insert>
+	<select id="prodCateList" resultType="ProdCateDTO">
+		select * from prod_cate
+	</select>
+	<select id="prodCatePageList" parameterType="java.util.Map" resultType="ProdCateDTO">
+		select b.* from (select rownum rn,a.* from prod_cate a)b where rn between #{start} and #{end}
+	</select>
+	<select id="prodList" resultType="AdminProdDTO">
+		select * from admin_prod where
+		prod_size = '0'
+	</select>
+	<select id="prodTypeList" parameterType="String"
+		resultType="AdminAllDTO">
+		select A.*,B.* from admin_prod A INNER JOIN prod_img B ON
+		A.prod_num = B.prod_num where prod_size = '0' and A.cate_kr_subType =
+		#{cate_kr_type} and A.del = 'N'
+	</select>
+	<select id = "typeDelList" parameterType = "String" resultType = "AdminAllDTO">
+	select A.*,B.* from admin_prod A INNER JOIN prod_img B ON
+		A.prod_num = B.prod_num where prod_size = '0' and A.cate_kr_subType =
+		#{string} and A.del = 'Y'
+	</select>
+	<select id="prodImgList" parameterType="ProdImgDTO">
+		select * from prod_img
+	</select>
+	<select id="prodImgTypeList" parameterType="Integer">
+		select * from
+		prod_img where prod_num = #{prodNum}
+	</select>
+	<select id="prodJoin" resultType="AdminAllDTO"
+		parameterType="int">
+		select A.*,B.* from admin_prod A INNER JOIN prod_img B
+		ON A.prod_num = B.prod_num where A.prod_num = #{prod_num} and A.del =
+		'N' and A.prod_size ='0'
+	</select>
+	<select id="cate_brand" resultType="String"
+		parameterType="String">
+		select distinct cate_brand from prod_cate where
+		cate_kr_brand = #{cate_code}
+	</select>
+	<select id="cate_type" resultType="String"
+		parameterType="String">
+		select distinct cate_type from prod_cate where
+		cate_kr_type = #{cate_code}
+	</select>
+	<select id="cate_subType" resultType="String"
+		parameterType="String">
+		select distinct cate_subType from prod_cate where
+		cate_kr_subType = #{cate_code}
+	</select>
+	<select id="prodImgNumList" resultType="int">
+		select prod_num from
+		prod_img
+	</select>
+	<select id="prodCateFind" parameterType="Map"
+		resultType="ProdCateDTO">
+		select * from prod_cate where ${search} = like
+		#{searchString}
+	</select>
+	<select id="prodFind" parameterType="Map"
+		resultType="AdminProdDTO">
+		select * from admin_prod where ${search} = like
+		#{searchString}
+	</select>
+	<delete id="prodCateDelete" parameterType="int">
+		delete from prod_cate
+		where cate_num = #{cate_num}
+	</delete>
+	<update id="prodImgEdit" parameterType="ProdImgDTO">
+		update prod_img set
+		prod_img1 = #{prod_img1},prod_img2 = #{prod_img2},prod_img3 =
+		#{prod_img3},prod_img4 = #{prod_img4},prod_img5 = #{prod_img5} where
+		prod_num=#{prod_num}
+	</update>
+	<update id="prodEdit" parameterType="AdminProdDTO">
+		update admin_prod set
+		prod_name = initcap(#{prod_name}),prod_kr_name = #{prod_kr_name},cate_brand =
+		initcap(#{cate_brand})
+		,cate_kr_brand = #{cate_kr_brand},cate_type = initcap(#{cate_type})
+		,cate_kr_type = #{cate_kr_type},cate_subType = initcap(#{cate_subType})
+		,cate_kr_subType = #{cate_kr_subType},prod_subject =
+		initcap(#{prod_subject})
+		,prod_kr_subject = #{prod_kr_subject},prod_color = initcap(#{prod_color})
+		,prod_kr_color = #{prod_kr_color},prod_price = #{prod_price},prod_gender = #{prod_gender}
+		where prod_group = #{prod_num}
+	</update>
+	<select id="getProd" parameterType="int">
+		select * from admin_prod
+		where prod_num = #{prod_num}
+	</select>
+	<insert id="prodPickInput" parameterType="String">
+		insert into pickList
+		values (pickList_seq.nextval,#{name})
+	</insert>
+	<select id="prodPickList" resultType="PickProdListDTO">
+		select * from pickList
+	</select>
+	<delete id="prodPickDelete" parameterType="int">
+		delete * from pickList
+		where pick_num = #{pick_num}
+	</delete>
+	<select id="getProdGroup" parameterType="String"
+		resultType="int">
+		select prod_group from admin_prod where prod_kr_subject =
+		#{prod_kr_subject}
+	</select>
+	<select id="brand_kr_list" resultType="String">
+		select DISTINCT
+		cate_kr_brand from prod_cate
+	</select>
+	
+	<select id="brandList" resultType="String">
+		select DISTINCT cate_brand
+		from prod_cate
+	</select>
+	<select id="cate_kr_typeList" resultType="String">
+		select DISTINCT
+		cate_kr_type from prod_cate
+	</select>
+	<select id="cate_typeList" resultType="String">
+		select DISTINCT cate_type,cate_kr_type
+		from prod_cate
+	</select>
+	<select id="cate_kr_subtypeList" resultType="String">
+		select DISTINCT
+		cate_kr_subType from prod_cate
+	</select>
+	<select id="cate_subTypeList" resultType="String">
+		select DISTINCT
+		cate_subType from prod_cate
+	</select>
+	<select id="cate_two" resultType="ProdCateDTO">
+		select DISTINCT cate_kr_type,cate_type from prod_cate
+	</select>
+	<select id="brandSelectList" resultType="AdminAllDTO"
+		parameterType="String">
+		select A.*,B.* from admin_prod A INNER JOIN prod_img B
+		on A.prod_num = B.prod_num where A.prod_size = '0' and A.cate_brand =
+		#{brand} and A.del = 'N'
+	</select>
+	<select id="brandDelSelectList" resultType="AdminAllDTO"
+		parameterType="String">
+		select A.*,B.* from admin_prod A INNER JOIN prod_img B
+		on A.prod_num = B.prod_num where A.prod_size = '0' and A.cate_brand =
+		#{string} and A.del = 'Y'
+	</select>
+	<select id="getCate" resultType="ProdCateDTO"
+		parameterType="int">
+		select * from prod_cate where cate_num = #{cate_num}
+	</select>
+	<select id="prodSubjectCount" resultType="int"
+		parameterType="adminProdDTO">
+		select count(*) from admin_prod 
+		where prod_subject = #{prod_subject} and prod_kr_subject = #{prod_kr_subject}
+	</select>
+	<select id="delList" resultType="AdminAllDTO"
+		parameterType="int">
+		select A.*,B.* from admin_prod A inner join prod_img B
+		on A.prod_num = B.prod_num where A.prod_size = '0' and
+		A.prod_num=#{prod_num} and A.del = 'Y'
+	</select>
+	<select id="delNumList" resultType="int">
+		select prod_num from
+		admin_prod where del = 'Y' and prod_size = '0'
+	</select>
+	<select id="AllNumList" resultType="int">
+		select prod_num from
+		admin_prod where del = 'N' and prod_size = '0'
+	</select>
+	<select id="prodCount" resultType="int" parameterType="String">
+		select count(*) from admin_prod where cate_brand = #{cate_brand} and del =
+		'N'
+	</select>
+	<select id="imgList" resultType="ProdImgDTO" parameterType="int">
+		select * from prod_img where prod_num = #{prod_num}
+	</select>
+	<update id="prodRegist" parameterType="int">
+		update admin_prod set del
+		= 'N' where prod_group = #{prod_num}
+	</update>
+	<select id="cateTypeList" parameterType="Map"
+		resultType="ProdCateDTO">
+		select distinct ${value2},${value3} from prod_cate where
+		${value} = #{result} and ${brand} = #{subVal}
+	</select>
+	<select id="cateCheck" parameterType="ProdCateDTO"
+		resultType="int">
+		select count(*) from prod_cate where cate_brand =
+		#{cate_brand} and cate_type = #{cate_type} and cate_subType =
+		#{cate_subType}
+	</select>
+	<select id="cateKrCheck" parameterType="ProdCateDTO"
+		resultType="int">
+		select count(*) from prod_cate where cate_kr_brand =
+		#{cate_kr_brand} and cate_kr_type = #{cate_kr_type} and
+		cate_kr_subType = #{cate_kr_subType}
+	</select>
+	<select id="pickCateCheck" parameterType="PickCateListDTO"
+		resultType="int">
+		select count(*) from pickCate_list where tab_name = #{tab_name} and pick_name = #{pick_name}
+	</select>
+	<insert id="pickCateInput" parameterType="PickCateListDTO">
+		insert into
+		pickCate_list
+		values(pickCate_list_seq.nextval,#{tab_name},initcap(#{pick_name}),#{pick_kr_name})
+	</insert>
+	<select id="pickCateList" resultType="PickCateListDTO">
+		select * from pickCate_list
+	</select>
+	<select id="pickCateTab" resultType="String">
+		select distinct tab_name
+		from pickCate_list
+	</select>
+	<select id="pickProdCheck" resultType="int"
+		parameterType="PickProdListDTO">
+		select count (*) from pickProd_list where cate_num =
+		#{cate_num} and prod_num = #{prod_num}
+	</select>
+	<insert id="pickProdInput" parameterType="PickProdListDTO">
+		insert into
+		pickProd_list values (#{cate_num},#{prod_num})
+	</insert>
+	<select id="pickProdNumList" resultType="int">
+		select prod_num from
+		pickProd_list
+	</select>
+	<select id="pickProd" resultType="AdminAllDTO">
+		select A.* ,C.*,D.* from (admin_prod A inner join pickProd_list B on
+		A.prod_num = B.prod_num inner join prod_img D on A.prod_num =
+		D.prod_num) inner join pickCate_list C on B.cate_num = C.cate_num
+		order by B.cate_num
+	</select>
+
+	<select id="selectPickList" resultType="PickCateListDTO"
+		parameterType="String">
+		select ${result} from pickCate_list where ${value1} =
+		#{value2}
+	</select>
+	<select id="selectLastPick" resultType="PickCateListDTO"
+		parameterType="Map">
+		select * from pickCate_list where tab_name = #{result}
+		and pick_name = #{value1} and pick_kr_name = #{value2}
+	</select>
+	<delete id="pickCateDelete" parameterType="int">
+		delete from
+		pickCate_list where cate_num = #{cate_num}
+	</delete>
+	<delete id="pickProdDelete" parameterType="PickProdListDTO">
+		delete from
+		pickProd_list where cate_num = #{cate_num} and prod_num = #{prod_num}
+	</delete>
+	<select id="searchProdList" parameterType="String"
+		resultType="AdminAllDTO">
+		select
+		a.prod_num,
+		a.prod_group,
+		b.prod_img1,
+		case when replace(upper(a.prod_subject),' ','')
+		like
+		replace(upper(#{searchString}),' ','') then a.prod_subject
+		when
+		replace(upper(prod_kr_subject),' ','') like
+		replace(upper(#{searchString}),' ','') then a.prod_kr_subject
+		end as
+		subject
+		from
+		(admin_prod a inner join prod_img b
+		on a.prod_num =
+		b.prod_num)
+		where (replace(upper(a.prod_subject),' ','') like
+		replace(upper(#{searchString}),' ','')
+		or
+		replace(upper(prod_kr_subject),' ','') like
+		replace(upper(#{searchString}),' ',''))
+		and a.del = 'N' and a.prod_size
+		='0'
+	</select>
+	<select id = "searchProdDelList" parameterType = "String" resultType = "AdminAllDTO">
+	select
+		a.prod_num,
+		b.prod_img1,
+		case when replace(upper(a.prod_subject),' ','')
+		like
+		replace(upper(#{searchString}),' ','') then a.prod_subject
+		when
+		replace(upper(prod_kr_subject),' ','') like
+		replace(upper(#{searchString}),' ','') then a.prod_kr_subject
+		end as
+		subject
+		from
+		(admin_prod a inner join prod_img b
+		on a.prod_num =
+		b.prod_num)
+		where (replace(upper(a.prod_subject),' ','') like
+		replace(upper(#{searchString}),' ','')
+		or
+		replace(upper(prod_kr_subject),' ','') like
+		replace(upper(#{searchString}),' ',''))
+		and a.del = 'Y' and a.prod_size
+		='0'
+	</select>
+	<select id = "allList" resultType = "AdminAllDTO">
+		select A.*,B.*	from admin_prod A inner join prod_img B on A.prod_num = B.prod_num where A.prod_size = '0' and A.del = 'N'
+	</select>
+	<select id ="prodQtyList" resultType = "AdminAllDTO">
+		select A.*,B.* from admin_prod A inner join prod_img B on A.prod_group = B.prod_num where A.prod_size != '0' and A.del = 'N' and A.prod_qty <![CDATA[ < ]]> 10
+	</select>
+	<update id="edit_prod_qty" parameterType = "AdminProdDTO">
+		update admin_prod set prod_qty = #{prod_qty} where prod_group = #{prod_num} and prod_size = #{prod_size}
+	</update>
+	<select id="getSalesInfo" parameterType="adminProdDTO" resultType="salesAllDTO">
+		select 
+		prod_num,prod_subject,prod_kr_subject,prod_price,prod_gender as gender,prod_qty 
+		from
+		admin_prod
+		where prod_group=#{prod_num} and prod_size = #{prod_size}
+	</select>
+	<select id = "prod_qty_edit" resultType = "AdminAllDTO" parameterType = "int">
+		select A.*,B.* from admin_prod A inner join prod_img B on A.prod_group = B.prod_num where A.prod_num = #{prod_num} and A.del ='N'
+	</select>
+	<select id = "deadLine" parameterType = "Map" resultType = "AdminAllDTO">
+		select C.* from (select rownum rn, A.*,B.prod_img1 from ((select * from admin_prod where prod_qty <![CDATA[ < ]]> 10 and prod_size != '0' and del = 'N' order by prod_num desc )A inner join (select * from prod_img)B on A.prod_group = B.prod_num))C where rn between #{startRow} and #{endRow} 
+	</select>
+	<select id ="deadCount" resultType = "int">
+		select count(*) from admin_prod A inner join prod_img B on A.prod_group = B.prod_num where A.prod_qty <![CDATA[ < ]]> 10 and A.del = 'N' and A.prod_size != '0'
+	</select>
+	<select id = "shopAddList" resultType = "AdminAllDTO" parameterType = "String">
+		select A.*,D.* from (admin_prod A inner join pickProd_list B on
+		A.prod_num = B.prod_num inner join prod_img D on A.prod_num =
+		D.prod_num) inner join pickCate_list C on B.cate_num = C.cate_num 
+		where C.pick_name = #{pick_name} and a.del = 'N'
+	</select>
+	<select id = "qtyCount" parameterType= "int" resultType = "int">
+		select count(*) from admin_prod where prod_group = #{prod_group} and del = 'N' and prod_qty <![CDATA[ < ]]> 10
+	</select>
+	<select id = "getProdAll" resultType = "AdminAllDTO" parameterType = "int">
+		select A.*,B.* from admin_prod A inner join prod_img B on A.prod_group = B.prod_num where A.prod_num = #{prod_group} and A.del = 'N' and A.prod_size = '0'
+	</select>
+	<select id = "getSizeDTO" resultType = "AdminAllDTO" parameterType = "int">
+		select A.*,B.* from admin_prod A inner join prod_img B on A.prod_group = B.prod_num where A.prod_num = #{prod_num} and A.del = 'N'
+	</select>
+	   <select id = "twoTypeAnother" resultType = "ProdCateDTO">
+   	select distinct cate_kr_type,cate_kr_subType from prod_cate
+   </select>
+   <insert id="directExport" parameterType="salesAllDTO">
+   	insert into sales values(sales_seq.nextval,'out',#{reg_date},#{prod_num},#{prod_qty},#{prod_subject},#{prod_kr_subject},#{gender},'direct',#{money},'')
+   </insert>
+   
+   <select id="getProdCateCount" resultType="int">
+   	select count(*) from prod_cate
+   </select>
+   
+   <select id="geteProdCateBrandCount" parameterType="java.util.Map" resultType="int">
+   	select
+   	count(*)
+   	from
+   	prod_cate
+   	where 
+   	(replace(upper(cate_brand),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(cate_kr_brand),' ','') like replace(upper(#{searchString}),' ',''))
+   </select>
+   
+   <select id="geteProdCateTypeCount" parameterType="java.util.Map" resultType="int">
+   	select
+   	count(*)
+   	from
+   	prod_cate
+   	where 
+   	(replace(upper(cate_type),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(cate_kr_type),' ','') like replace(upper(#{searchString}),' ',''))
+   </select>
+   
+   <select id="geteProdCateSubTypeCount" parameterType="java.util.Map" resultType="int">
+   	select
+   	count(*)
+   	from
+   	prod_cate
+   	where 
+   	(replace(upper(cate_subType),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(cate_kr_subType),' ','') like replace(upper(#{searchString}),' ',''))
+   </select>
+   
+   <select id="geteProdCateBrandFind" parameterType="java.util.Map" resultType="ProdCateDTO">
+   	select
+   	b.*
+   	from
+   	(select rownum rn,a.* from prod_cate a
+   	where 
+   	(replace(upper(cate_brand),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(cate_kr_brand),' ','') like replace(upper(#{searchString}),' ','')))b
+   	where 
+   	(replace(upper(b.cate_brand),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(b.cate_kr_brand),' ','') like replace(upper(#{searchString}),' ',''))
+  	and rn between #{start} and #{end}	 
+   </select>
+   
+   <select id="geteProdCateTypeFind" parameterType="java.util.Map" resultType="ProdCateDTO">
+   	select
+   	b.*
+   	from
+   	(select rownum rn,a.* from prod_cate a
+   	where 
+   	(replace(upper(cate_type),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(cate_kr_type),' ','') like replace(upper(#{searchString}),' ','')))b
+   	where 
+   	(replace(upper(b.cate_type),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(b.cate_kr_type),' ','') like replace(upper(#{searchString}),' ',''))
+  	and rn between #{start} and #{end}	 
+   </select>
+   
+   <select id="geteProdCateSubTypeFind" parameterType="java.util.Map" resultType="ProdCateDTO">
+   	select
+   	b.*
+   	from
+   	(select rownum rn,a.* from prod_cate a
+   	where 
+   	(replace(upper(cate_subType),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(cate_kr_subType),' ','') like replace(upper(#{searchString}),' ','')))b
+   	where 
+   	(replace(upper(b.cate_subType),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(b.cate_kr_subType),' ','') like replace(upper(#{searchString}),' ',''))
+  	and rn between #{start} and #{end}	 
+   </select>
+   
+   <select id="pickCateCount" resultType="int">
+   	select count(*) from pickCate_list
+   </select>
+   
+   <select id="pickCatePageList" parameterType="java.util.Map" resultType="PickCateListDTO">
+   	select 
+   	b.*
+   	from
+   	(select rownum rn,a.* from pickCate_list a)b
+   	where
+   	rn between #{start} and #{end} 
+   </select>
+   
+   <select id="pickProdCount" resultType="int">
+   	select count(*) from pickProd_list
+   </select>
+    <select id="pickProdPage" parameterType="java.util.Map" resultType="AdminAllDTO">
+		select 
+		G.* 
+		from (select rownum rn,F.* from (select A.*,C.*,D.prod_img1 from admin_prod A inner join pickProd_list B on
+		A.prod_num = B.prod_num inner join prod_img D on A.prod_num =
+		D.prod_num inner join pickCate_list C on B.cate_num = C.cate_num order by B.cate_num)F)G
+		where rn between #{start} and #{end}
+	</select>
+	
+	<select id="pickProdTabFindCount" parameterType="java.util.Map" resultType="int">
+	select
+	count(*)
+	from
+	admin_prod A inner join pickProd_list B 
+	on	A.prod_num = B.prod_num 
+	inner join prod_img C 
+	on A.prod_num =	C.prod_num 
+	inner join pickCate_list D 
+	on B.cate_num = D.cate_num 
+	where D.tab_name like #{searchString}
+	</select>
+	
+	<select id="pickProdPickFindCount" parameterType="java.util.Map" resultType="int">
+	select
+	count(*)
+	from
+	admin_prod A inner join pickProd_list B 
+	on	A.prod_num = B.prod_num 
+	inner join prod_img C 
+	on A.prod_num =	C.prod_num 
+	inner join pickCate_list D 
+	on B.cate_num = D.cate_num 
+	where 
+	(replace(upper(D.pick_name),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(D.pick_kr_name),' ','') like replace(upper(#{searchString}),' ',''))
+	</select>
+	
+	<select id="pickProdProdFindCount" parameterType="java.util.Map" resultType="int">
+	select
+	count(*)
+	from
+	admin_prod A inner join pickProd_list B 
+	on	A.prod_num = B.prod_num 
+	inner join prod_img C 
+	on A.prod_num =	C.prod_num 
+	inner join pickCate_list D 
+	on B.cate_num = D.cate_num 
+	where 
+	(replace(upper(A.prod_subject),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(A.prod_kr_subject),' ','') like replace(upper(#{searchString}),' ',''))
+	</select>
+	
+	<select id="pickProdTabFind" parameterType="java.util.Map" resultType="AdminAllDTO">
+		select 
+		G.* 
+		from (select rownum rn,F.* from (select A.*,C.*,D.prod_img1 from admin_prod A inner join pickProd_list B on
+		A.prod_num = B.prod_num inner join prod_img D on A.prod_num =
+		D.prod_num inner join pickCate_list C on B.cate_num = C.cate_num 
+		where C.tab_name like #{searchString}
+		order by B.cate_num,A.prod_kr_subject)F)G
+		where rn between #{start} and #{end}
+	</select>
+	
+	<select id="pickProdPickFind" parameterType="java.util.Map" resultType="AdminAllDTO">
+		select 
+		G.* 
+		from (select rownum rn,F.* from (select A.*,C.*,D.prod_img1 from admin_prod A inner join pickProd_list B on
+		A.prod_num = B.prod_num inner join prod_img D on A.prod_num =
+		D.prod_num inner join pickCate_list C on B.cate_num = C.cate_num 
+		where (replace(upper(C.pick_name),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(C.pick_kr_name),' ','') like replace(upper(#{searchString}),' ',''))
+  		 order by B.cate_num,A.prod_kr_subject
+  		 )F)G
+		where rn between #{start} and #{end}
+	</select>
+	
+	<select id="pickProdProdFind" parameterType="java.util.Map" resultType="AdminAllDTO">
+		select 
+		G.* 
+		from (select rownum rn,F.* from (select A.*,C.*,D.prod_img1 from admin_prod A inner join pickProd_list B on
+		A.prod_num = B.prod_num inner join prod_img D on A.prod_num =
+		D.prod_num inner join pickCate_list C on B.cate_num = C.cate_num 
+		where (replace(upper(A.prod_subject),' ','') like replace(upper(#{searchString}),' ','') 
+  		 or replace(upper(A.prod_kr_subject),' ','') like replace(upper(#{searchString}),' ',''))
+  		 order by B.cate_num,A.prod_kr_subject
+  		 )F)G
+		where rn between #{start} and #{end}
+	</select>
+	
+	
+	<!-- 상품 목록 부분 -->
+	
+	<!-- del N 전체 상품 -->
+	<select id="delNProdList" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.del = 'N' and a.prod_size = '0'
+		order by a.prod_kr_subject
+	</select>
+	<!-- del N 브랜드,카테대분류,카테소분류 상품 -->
+	<select id="delNTypeProdList" parameterType="java.util.Map" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.del = 'N' and a.prod_size = '0'
+		and a.${type} = #{subType}
+		order by a.prod_kr_subject
+	</select>
+	<!-- del Y 전체 상품 -->
+	<select id="delYProdList" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.del = 'Y' and a.prod_size = '0'
+		order by a.prod_kr_subject
+	</select>
+	<!-- del Y 브랜드,카테대분류,카테소분류 상품 -->
+	<select id="delYTypeProdList" parameterType="java.util.Map" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.del = 'Y' and a.prod_size = '0'
+		and a.${type} = #{subType}
+		order by a.prod_kr_subject
+	</select>
+	<!-- 사이즈 별 상품 -->
+	<select id="getProdNumList" parameterType="java.util.Map" resultType="int">
+		select
+		prod_group
+		from
+		admin_prod
+		where del = #{del}
+		and prod_size = #{subType}
+		and prod_qty != 0
+	</select>
+	<select id="getProdSizeProdList" parameterType="java.util.List" resultType="adminAllDTO">
+		select
+		a.*,b.prod_img1
+		from
+		admin_prod a inner join prod_img b
+		on a.prod_num = b.prod_num
+		where a.prod_num in
+		<foreach collection='list' index='index' item='prod_group' open='(' close=')' separator=','>
+		#{prod_group}
+		</foreach>
+		order by a.prod_kr_subject
+	</select>
+		<select id = "getProdPrice" parameterType = "int" resultType = "int">
+		select prod_price from admin_prod where prod_num = #{prod_num}
+	</select>
+	<select id = "getProdQty" parameterType = "int" resultType = "int">
+		select prod_qty from admin_prod where prod_num = #{prod_num}
+	</select>
+	<select id  = "prodNumList" parameterType = "AdminAllDTO" resultType = "int">
+		select prod_num	from admin_prod where prod_group = #{prod_num} and prod_size != '0'
+	</select>
+	<select id = "getProduct" parameterType = "AdminProdDTO" resultType = "AdminProdDTO">
+		select * from admin_prod where prod_num = #{i}
+	</select>
+	<select id = "getProd_num" parameterType = "AdminProdDTO" resultType = "AdminProdDTO">
+		select * from admin_prod where prod_group = #{prod_num} and prod_size = #{prod_size}
+	</select>
+	
+</mapper>
